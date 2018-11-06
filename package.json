@@ -22,6 +22,7 @@
     "vue-template-compiler": "^2.5.17"
   },
   "scripts": {
-    "build": "parcel build index.html"
+    "build": "parcel build index.html",
+    "catalog": "parcel build catalog.html"
   }
 }
