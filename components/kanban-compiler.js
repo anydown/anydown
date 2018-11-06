@@ -1,28 +1,44 @@
+function isStartWith(line, chara) {
+  return line.trim().indexOf(chara) === 0;
+}
+function isHeading(line) {
+  return isStartWith(line, "#");
+}
+function isList(line) {
+  return isStartWith(line, "*");
+}
+function removeMarkup(line, chara) {
+  return line
+    .trim()
+    .replace(chara, "")
+    .trim();
+}
+
 export function compileKanban(input) {
-  var lines = input.split(/[\r|\n|\r\n]/);
-  var output = [];
-  var cards = [];
+  const lines = input.split(/[\r|\n|\r\n]/);
+  const output = [];
+  let cards = [];
   lines.forEach(function(line) {
-    if (line.trim().indexOf("#") === 0) {
+    if (isHeading(line)) {
       cards = [];
 
       output.push({
-        name: line
-          .trim()
-          .replace("#", "")
-          .trim(),
+        name: removeMarkup(line, "#"),
         cards: cards
       });
-    } else if (line.trim().indexOf("*") === 0) {
-      cards.push(
-        line
-          .trim()
-          .replace("*", "")
-          .trim()
-      );
+    } else if (isList(line)) {
+      cards.push(removeMarkup(line, "*"));
     }
   });
   return output;
+}
+
+function cardsToString(cards) {
+  return cards.map(toList).join("\n");
+}
+
+function toList(card) {
+  return "* " + card;
 }
 
 export function serializeKanban(data) {
@@ -30,14 +46,7 @@ export function serializeKanban(data) {
     "kanban\n" +
     data
       .map(item => {
-        return (
-          `# ${item.name}\n` +
-          item.cards
-            .map(card => {
-              return "* " + card;
-            })
-            .join("\n")
-        );
+        return `# ${item.name}\n${cardsToString(item.cards)}`;
       })
       .join("\n") +
     "\n"
