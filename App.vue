@@ -1,5 +1,5 @@
 <template>
-  <div class="app" @drop="ondrop">
+  <div class="app">
     <vue-split-pane :min-percent='20' :default-percent='40' split="vertical">
       <template slot="paneL">
         <codemirror ref="codemirror" id="input" v-model="input" :options="codeMirrorOption"></codemirror>
@@ -20,7 +20,6 @@ import MarkdownBlock from "./components/MarkdownBlock.vue";
 import CodeBlockKanban from "./components/CodeBlockKanban.vue";
 import CodeBlockGantt from "./components/CodeBlockGantt.vue";
 import { example } from "./util/example.js";
-import menu from "./util/menu";
 import { compile } from "./util/document-compiler";
 
 import { codemirror } from "vue-codemirror-lite";
@@ -90,127 +89,17 @@ export default {
         this.input = example;
       }
     },
-    readFile(path, cb) {
-      var electronFs = this.$electron.remote.require("fs");
-      electronFs.readFile(path, "utf8", (err, text) => {
-        if (err && err.code === "ENOENT") {
-          alert("以下のファイルが存在しません: \n" + path);
-          this.setPath("");
-          return;
-        }
-        if (err) {
-          alert(err);
-          return;
-        }
-        if (!err) {
-          this.input = text;
-          this.resetDirtyFlag();
-          this.setPath(path);
-        }
-        cb();
-      });
-    },
     resetDirtyFlag() {
       this.originalInput = this.input;
       this.checkDirty();
-    },
-    writeFile(path, text) {
-      var electronFs = this.$electron.remote.require("fs");
-      electronFs.writeFile(path, text, "utf8", err => {
-        if (err) {
-          alert(err);
-        }
-        this.resetDirtyFlag();
-      });
-    },
-    newFile() {
-      (this.path = ""), this.setPath("");
-    },
-    menuNewFile() {
-      this.newFile();
-    },
-    setPath(path) {
-      this.path = path;
-      localStorage.setItem(LOCALSTORAGE_LAST_EDITED_FILE, path);
-      const dirty = this.isDirty ? " *" : "";
-      if (this.path === "") {
-        document.title = "anydown - untitled";
-      } else {
-        document.title = "anydown - " + path + dirty;
-      }
-    },
-    menuSaveFile() {
-      if (this.path === "") {
-        this.menuSaveAs();
-      } else {
-        this.writeFile(this.path, this.input);
-      }
-    },
-    menuSaveAs() {
-      const remote = this.$electron.remote;
-      const focusedWindow = remote.BrowserWindow.getFocusedWindow();
-      const savePath = remote.dialog.showSaveDialog(focusedWindow, {
-        title: "保存",
-        filters: filters
-      });
-      if (savePath) {
-        this.setPath(savePath);
-        this.writeFile(savePath, this.input);
-      }
-    },
-    menuOpenFile() {
-      const remote = this.$electron.remote;
-      const focusedWindow = remote.BrowserWindow.getFocusedWindow();
-      remote.dialog.showOpenDialog(
-        focusedWindow,
-        {
-          title: "ファイルを開く",
-          filters: filters,
-          properties: ["openFile"]
-        },
-        item => {
-          if (item) {
-            this.readFile(item[0]);
-          }
-        }
-      );
-    },
-    ondrop(e) {
-      if (e.dataTransfer.files[0]) {
-        this.readFile(e.dataTransfer.files[0].path);
-      }
     }
   },
   mounted() {
-    const lastEditedFile = localStorage.getItem(LOCALSTORAGE_LAST_EDITED_FILE);
-    if (lastEditedFile) {
-      this.readFile(lastEditedFile, () => {
-        const storage = localStorage.getItem(LOCALSTORAGE_KEY);
-        if (storage) {
-          this.input = storage;
-        }
-      });
+    const storage = localStorage.getItem(LOCALSTORAGE_KEY);
+    if (storage) {
+      this.input = storage;
     } else {
-      const storage = localStorage.getItem(LOCALSTORAGE_KEY);
-      if (storage) {
-        this.input = storage;
-      } else {
-        this.input = example;
-      }
-    }
-
-    if (this.$electron) {
-      menu.openFile = this.menuOpenFile;
-      menu.newFile = this.menuNewFile;
-      menu.saveFile = this.menuSaveFile;
-      menu.saveAsFile = this.menuSaveAs;
-      menu.print = () => {
-        window.printToPdf();
-      };
-      menu.insert = code => {
-        this.editor.replaceSelection(code);
-      };
-      menu.ready(this.$electron);
+      this.input = example;
     }
   },
   components: {
