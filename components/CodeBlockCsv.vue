@@ -108,13 +108,15 @@ export default {
     },
     stringData() {
       return `csv
-${this.data.map(i => i.join(",")).join("\n")}`;
+${this.data.map(i => i.join(",")).join("\n")}
+`;
     }
   },
   methods: {
     updateData(input) {
       let data = this.input
         .split(/[\r|\n|\r\n]/)
+        .filter(item => item.length > 0)
         .map(i => i.split(","))
         .filter(item => item.length > 0);
       //最初の一行を除去
@@ -123,8 +125,8 @@ ${this.data.map(i => i.join(",")).join("\n")}`;
       let normalized = [];
       let max = 0;
       for (const col of data) {
-        if(max < col.length){
-          max = col.length
+        if (max < col.length) {
+          max = col.length;
         }
       }
       for (const col of data) {
