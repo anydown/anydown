@@ -3,11 +3,13 @@
         <!-- <CodeBlockKanban :input="Hello"></CodeBlockKanban> -->
         <code-block-gantt :input="exampleGantt"></code-block-gantt>
         <code-block-kanban :input="exampleKanban"></code-block-kanban>
+        <code-block-csv :input="exampleSpreadSheet"/>
     </div>
 </template>
 <script>
 import CodeBlockKanban from "./CodeBlockKanban.vue";
 import CodeBlockGantt from "./CodeBlockGantt.vue";
+import CodeBlockCsv from "./CodeBlockCsv.vue";
 
 const exampleGantt = `
 gantt
@@ -25,15 +27,21 @@ kanban
 * タスク２
 `;
 
+const exampleSpreadSheet = `"Yamada Taro","12","M"
+1,2,3
+4,5,6`;
+
 export default {
   components: {
     CodeBlockKanban,
-    CodeBlockGantt
+    CodeBlockGantt,
+    CodeBlockCsv
   },
   data() {
     return {
       exampleGantt: exampleGantt,
-      exampleKanban: exampleKanban
+      exampleKanban: exampleKanban,
+      exampleSpreadSheet: exampleSpreadSheet
     };
   }
 };

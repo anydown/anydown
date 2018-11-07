@@ -19,6 +19,7 @@
 import MarkdownBlock from "./components/MarkdownBlock.vue";
 import CodeBlockKanban from "./components/CodeBlockKanban.vue";
 import CodeBlockGantt from "./components/CodeBlockGantt.vue";
+import CodeBlockCsv from "./components/CodeBlockCsv.vue";
 import { example } from "./util/example.js";
 import { compile } from "./util/document-compiler";
 
@@ -106,6 +107,7 @@ export default {
     MarkdownBlock,
     CodeBlockKanban,
     CodeBlockGantt,
+    CodeBlockCsv,
     codemirror,
     VueSplitPane
   }

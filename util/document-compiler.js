@@ -9,6 +9,9 @@ export function compile(input) {
       if (block.indexOf("gantt") === 0) {
         type = "code-block-gantt";
       }
+      if (block.indexOf("csv") === 0) {
+        type = "code-block-csv";
+      }
     }
     return {
       text: block,
