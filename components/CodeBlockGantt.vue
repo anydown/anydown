@@ -8,6 +8,10 @@
         <!-- 月 -->
         <text v-for="(line, index) in lines" :x="line.x" y="-28" text-anchor="start" font-weight="900" font-size="0.8rem" fill="#9C9" :key="index">{{line.labelMonth}}</text>
       </g>
+
+      <!-- 本日 -->
+      <rect :x="todayX" fill="#DDF" y=-23 width=20 height=20 rx=10 ry=10></rect>
+
       <g>
       <!-- 日付 -->
         <text v-for="(line, index) in lines" :x="line.x + 12" y="-8" text-anchor="middle" font-size="0.8rem" :fill="line.color" :key="index">{{line.label}}</text>
@@ -23,6 +27,25 @@
       </g>
       <rect v-if="dragoverIndex > -1 && dragoverIndex !== selectedIndex" class="dragover" x="0" :y="32 * dragoverIndex" :width="svgWidth" height="32"></rect>
     </g>
+
+    <!-- 前へ -->
+    <g :transform="`translate(${svgWidth - 24 * 3 - 0.5}, 0.5)`" @click="moveRange(-7)" style="cursor: pointer;">
+      <rect fill="white" x=0 y=0 width=20 height=20 rx=4 ry=4></rect>
+      <polyline points="15 5 5 10 15 15" stroke="#999" fill="none"/>
+    </g>
+
+    <!-- 次へ -->
+    <g :transform="`translate(${svgWidth - 24 * 2 - 0.5}, 0.5)`" @click="moveRange(7)" style="cursor: pointer;">
+      <rect fill="white" x=0 y=0 width=20 height=20 rx=4 ry=4></rect>
+      <polyline points="5 5 15 10 5 15" stroke="#999" fill="none"/>
+    </g>
+
+    <!-- タスク追加 -->
+    <g :transform="`translate(${svgWidth - 24.5}, 0.5)`" @click="addTask" style="cursor: pointer;">
+      <rect fill="white" stroke="#999" x=0 y=0 width=20 height=20 rx=4 ry=4></rect>
+      <line x1=10 x2=10 y1=5 y2=15 stroke="ForestGreen"></line>
+      <line x1=5 x2=15 y1=10 y2=10 stroke="ForestGreen"></line>
+    </g>    
   </svg>
 </template>
 <script>
@@ -130,6 +153,21 @@ export default {
     },
     setTasks(input) {
       this.tasks = gantt.compile(input);
+    },
+    addTask() {
+      const task = window.prompt("タスク名入力");
+      if (task) {
+        this.tasks.push({
+          name: task,
+          start: util.getRelativeDate(0).getTime(),
+          end: util.getRelativeDate(1).getTime()
+        });
+      }
+    },
+    moveRange(offset) {
+      this.displayRange.start += offset;
+      this.displayRange.end += offset;
+      this.generateLine();
     }
   },
   watch: {
@@ -149,6 +187,15 @@ export default {
     },
     displayRangeLength() {
       return this.displayRange.end - this.displayRange.start;
+    },
+    todayX() {
+      const start = this.timeRange[0];
+      const end = this.timeRange[1];
+      const len = end - start;
+
+      const reldate = util.getRelativeDate(0);
+      const t = ((reldate.getTime() - start) / len) * this.svgWidth;
+      return Math.round(t);
     }
   },
   mounted() {
