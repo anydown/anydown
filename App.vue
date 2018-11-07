@@ -127,17 +127,17 @@ export default {
       var cursor = doc.getCursor();
       doc.replaceRange(text, cursor);
     },
-    installPwa(){
-        this.installPwaButtonVisible = false
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(choiceResult => {
-          if (choiceResult.outcome === "accepted") {
-            console.log("User accepted the A2HS prompt");
-          } else {
-            console.log("User dismissed the A2HS prompt");
-          }
-          deferredPrompt = null;
-        });
+    installPwa() {
+      this.installPwaButtonVisible = false;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(choiceResult => {
+        if (choiceResult.outcome === "accepted") {
+          console.log("User accepted the A2HS prompt");
+        } else {
+          console.log("User dismissed the A2HS prompt");
+        }
+        deferredPrompt = null;
+      });
     }
   },
   mounted() {
@@ -151,7 +151,7 @@ export default {
     window.addEventListener("beforeinstallprompt", e => {
       e.preventDefault();
       deferredPrompt = e;
-      this.installPwaButtonVisible = true
+      this.installPwaButtonVisible = true;
     });
   },
   components: {
@@ -185,7 +185,7 @@ body,
   border: 1px solid #999;
   padding: 0.25rem 0.75rem;
 }
-.installPwaButton{
+.installPwaButton {
   background: #c8ffc1;
   border: 1px solid #999;
   padding: 0.25rem 0.75rem;
