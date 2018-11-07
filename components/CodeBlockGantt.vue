@@ -119,35 +119,14 @@ export default {
         .invert(x);
     },
     generateLine() {
-      let lines = [];
       const start = this.timeRange[0];
       const end = this.timeRange[1];
-      const len = end - start;
-      let month = -1;
-      for (let i = 0; i < this.displayRangeLength; i++) {
-        const reldate = util.getRelativeDate(this.displayRange.start + i);
-        const t = ((reldate.getTime() - start) / len) * this.svgWidth;
-        let color = "#888888";
-        if (reldate.getDay() === 0) {
-          color = "#FF8888";
-        }
-        if (reldate.getDay() === 6) {
-          color = "#8888FF";
-        }
-        let monthStr = "";
-        if (month != reldate.getMonth() + 1) {
-          month = reldate.getMonth() + 1;
-          monthStr = reldate.getMonth() + 1 + "月";
-        }
-
-        lines.push({
-          x: Math.round(t),
-          label: reldate.getDate(),
-          color: color,
-          labelMonth: monthStr
-        });
-      }
-      this.lines = lines;
+      this.lines = generateLineByRange(
+        start,
+        end,
+        this.displayRange,
+        this.svgWidth
+      );
     },
     setTasks(input) {
       this.tasks = gantt.compile(input);
@@ -177,6 +156,37 @@ export default {
     this.setTasks(this.input);
   }
 };
+
+function generateLineByRange(start, end, displayRange, svgWidth) {
+  let lines = [];
+  const len = end - start;
+  let month = -1;
+  const displayRangeLength = displayRange.end - displayRange.start;
+  for (let i = 0; i < displayRangeLength; i++) {
+    const reldate = util.getRelativeDate(displayRange.start + i);
+    const t = ((reldate.getTime() - start) / len) * svgWidth;
+    let color = "#888888";
+    if (reldate.getDay() === 0) {
+      color = "#FF8888";
+    }
+    if (reldate.getDay() === 6) {
+      color = "#8888FF";
+    }
+    let monthStr = "";
+    if (month != reldate.getMonth() + 1) {
+      month = reldate.getMonth() + 1;
+      monthStr = reldate.getMonth() + 1 + "月";
+    }
+
+    lines.push({
+      x: Math.round(t),
+      label: reldate.getDate(),
+      color: color,
+      labelMonth: monthStr
+    });
+  }
+  return lines;
+}
 </script>
 <style>
 .task {
