@@ -1,6 +1,6 @@
 //Examples
 
-const kanbanExample = `\`\`\`kanban
+export const kanbanExample = `\`\`\`kanban
 # TODO
 * Task 1
 * Task 2
@@ -21,12 +21,18 @@ const exampleTask2 = `${d.getFullYear()}-${zeropad(d.getMonth() + 1)}-${zeropad(
 d.setDate(d.getDate() + 3);
 const exampleTask3 = `${d.getFullYear()}-${zeropad(d.getMonth() + 1)}-${zeropad(d.getDate())}`
 
-const ganttExample = `\`\`\`gantt
+export const ganttExample = `\`\`\`gantt
 Task1 ${exampleTask1} ${exampleTask2}
 Task2 ${exampleTask2} ${exampleTask3}
 \`\`\`
 `
 
+export const csvExample = `\`\`\`csv
+Taro, 100
+Jiro, 200
+Hanako, 300
+\`\`\`
+`
 
 export default {
   menubar: [],
