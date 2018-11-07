@@ -5,7 +5,7 @@ function isHeading(line) {
   return isStartWith(line, "#");
 }
 function isList(line) {
-  return isStartWith(line, "*");
+  return isStartWith(line, "-") ||  isStartWith(line, "*");
 }
 function removeMarkup(line, chara) {
   return line
@@ -27,7 +27,7 @@ export function compileKanban(input) {
         cards: cards
       });
     } else if (isList(line)) {
-      cards.push(removeMarkup(line, "*"));
+      cards.push(removeMarkup(removeMarkup(line, "-"), "*"));
     }
   });
   return output;
@@ -38,7 +38,7 @@ function cardsToString(cards) {
 }
 
 function toList(card) {
-  return "* " + card;
+  return "- " + card;
 }
 
 export function serializeKanban(data) {
@@ -48,7 +48,7 @@ export function serializeKanban(data) {
       .map(item => {
         return `# ${item.name}\n${cardsToString(item.cards)}`;
       })
-      .join("\n") +
+      .join("\n\n") +
     "\n"
   );
 }
