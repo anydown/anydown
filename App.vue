@@ -8,6 +8,7 @@
               <button class="insertButton" @click="insertExampleKanban"><span class="insertButton__plus">+</span> Kanban</button>
               <button class="insertButton" @click="insertExampleGantt"><span class="insertButton__plus">+</span> Gantt</button>
               <button class="insertButton" @click="insertExampleCsv"><span class="insertButton__plus">+</span> CSV</button>
+              <button v-if="installPwaButtonVisible" class="installPwaButton" @click="installPwa">Install PWA</button>
             </div>
             <div class="paneL__mode">
               LocalStorage Mode
@@ -55,6 +56,8 @@ const filters = [
   }
 ];
 
+let deferredPrompt;
+
 export default {
   name: "app",
   data() {
@@ -70,7 +73,8 @@ export default {
         theme: "monokai",
         lineWrapping: true,
         dragDrop: false //to prevent file drop insert
-      }
+      },
+      installPwaButtonVisible: true
     };
   },
   computed: {
@@ -122,6 +126,18 @@ export default {
       var doc = this.editor.getDoc();
       var cursor = doc.getCursor();
       doc.replaceRange(text, cursor);
+    },
+    installPwa(){
+        this.installPwaButtonVisible = false
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choiceResult => {
+          if (choiceResult.outcome === "accepted") {
+            console.log("User accepted the A2HS prompt");
+          } else {
+            console.log("User dismissed the A2HS prompt");
+          }
+          deferredPrompt = null;
+        });
     }
   },
   mounted() {
@@ -131,6 +147,12 @@ export default {
     } else {
       this.input = example;
     }
+
+    window.addEventListener("beforeinstallprompt", e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      this.installPwaButtonVisible = true
+    });
   },
   components: {
     MarkdownBlock,
@@ -160,6 +182,11 @@ body,
 
 .insertButton {
   background: white;
+  border: 1px solid #999;
+  padding: 0.25rem 0.75rem;
+}
+.installPwaButton{
+  background: #c8ffc1;
   border: 1px solid #999;
   padding: 0.25rem 0.75rem;
 }
