@@ -8,6 +8,7 @@
               <button class="insertButton" @click="insertExampleKanban"><span class="insertButton__plus">+</span> Kanban</button>
               <button class="insertButton" @click="insertExampleGantt"><span class="insertButton__plus">+</span> Gantt</button>
               <button class="insertButton" @click="insertExampleCsv"><span class="insertButton__plus">+</span> CSV</button>
+              <button class="insertButton" @click="insertExampleBlock"><span class="insertButton__plus">+</span> Block</button>
               <button v-if="installPwaButtonVisible" class="installPwaButton" @click="installPwa">Install PWA</button>
             </div>
             <div class="paneL__mode">
@@ -35,10 +36,16 @@ import MarkdownBlock from "./components/MarkdownBlock.vue";
 import CodeBlockKanban from "./components/CodeBlockKanban.vue";
 import CodeBlockGantt from "./components/CodeBlockGantt.vue";
 import CodeBlockCsv from "./components/CodeBlockCsv.vue";
-import CodeBlockPre from "./components/CodeBlockPre.vue"
+import CodeBlockBlock from "./components/CodeBlockBlock.vue";
+import CodeBlockPre from "./components/CodeBlockPre.vue";
 import { example } from "./util/example.js";
 import { compile } from "./util/document-compiler";
-import { kanbanExample, ganttExample, csvExample } from "./util/menu";
+import {
+  kanbanExample,
+  ganttExample,
+  csvExample,
+  blockExample
+} from "./util/menu";
 
 import { codemirror } from "vue-codemirror-lite";
 import VueSplitPane from "vue-splitpane";
@@ -123,6 +130,9 @@ export default {
     insertExampleCsv() {
       this.insertText(csvExample);
     },
+    insertExampleBlock() {
+      this.insertText(blockExample);
+    },
     insertText(text) {
       var doc = this.editor.getDoc();
       var cursor = doc.getCursor();
@@ -160,6 +170,7 @@ export default {
     CodeBlockKanban,
     CodeBlockGantt,
     CodeBlockCsv,
+    CodeBlockBlock,
     CodeBlockPre,
     codemirror,
     VueSplitPane

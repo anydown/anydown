@@ -10,6 +10,15 @@ export const kanbanExample = `\`\`\`kanban
 \`\`\`
 `
 
+export const blockExample = `\`\`\`block
+- Todo 40 30 199 105
+- Doing 40 250 199 105
+- Done 360 250 200 100
+>  140 150 140 240
+>  250 300 350 300
+\`\`\`
+`
+
 function zeropad(str) {
   return ("00" + str).slice(-2)
 }
