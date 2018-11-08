@@ -35,6 +35,7 @@ import MarkdownBlock from "./components/MarkdownBlock.vue";
 import CodeBlockKanban from "./components/CodeBlockKanban.vue";
 import CodeBlockGantt from "./components/CodeBlockGantt.vue";
 import CodeBlockCsv from "./components/CodeBlockCsv.vue";
+import CodeBlockPre from "./components/CodeBlockPre.vue"
 import { example } from "./util/example.js";
 import { compile } from "./util/document-compiler";
 import { kanbanExample, ganttExample, csvExample } from "./util/menu";
@@ -159,6 +160,7 @@ export default {
     CodeBlockKanban,
     CodeBlockGantt,
     CodeBlockCsv,
+    CodeBlockPre,
     codemirror,
     VueSplitPane
   }

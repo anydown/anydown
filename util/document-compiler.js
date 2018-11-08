@@ -12,6 +12,9 @@ export function compile(input) {
       if (block.indexOf("csv") === 0) {
         type = "code-block-csv";
       }
+      if (block.indexOf("\n") === 0) {
+        type = "code-block-pre";
+      }
     }
     return {
       text: block,
