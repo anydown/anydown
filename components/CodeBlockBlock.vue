@@ -6,9 +6,11 @@
                 <foreignObject :height="item.height" :width="item.width" x="0" y="0">
                     <div class="innerText" v-text="item.text"></div>
                 </foreignObject>
+                <rect @pointerdown="downHandle($event, item, 'x')" @pointerup="upHandle" @pointermove="moveHandle($event, item, 'x')"  fill="rgba(255,255,255,0)" x=0.5 y=0.5 :height="item.height" :width="item.width"></rect>
+
             </g>
 
-            <g v-if="item.type === 'line'">
+            <g v-if="item.type === 'line'" @pointerdown="downHandle($event, item, '-')" @pointerup="upHandle" @pointermove="moveHandle($event, item, '-')">
                 <line :x1="item.x1" :x2="item.x2" :y1="item.y1" :y2="item.y2" stroke="rgba(0,0,0,0)" stroke-width="10"></line>
                 <line :x1="item.x1" :x2="item.x2" :y1="item.y1" :y2="item.y2" stroke="black"></line>
             </g>
@@ -16,7 +18,7 @@
 
         <g v-if="selectedItem">
             <g v-if="selectedItem.type === 'box'" :transform="`translate(${selectedItem.x}, ${selectedItem.y})`">
-                <rect @pointerdown="downHandle($event, selectedItem, 'x')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, 'x')" fill="rgba(255,255,255,0)" stroke="green" x=0.5 y=0.5 :height="selectedItem.height" :width="selectedItem.width"></rect>
+                <rect fill="none" stroke="green" x=0.5 y=0.5 :height="selectedItem.height" :width="selectedItem.width"></rect>
                 <rect @pointerdown="downHandle($event, selectedItem, 'tl')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, 'tl')" x=-5 y=-5 height=10 width=10  fill="white" stroke="green"></rect>
                 <rect @pointerdown="downHandle($event, selectedItem, 'tl')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, 'tr')" :x="-5 + selectedItem.width" y=-5 height=10 width=10 fill="white" stroke="green"></rect>
                 <rect @pointerdown="downHandle($event, selectedItem, 'dr')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, 'dr')" :x="-5 + selectedItem.width" :y="-5 + selectedItem.height" height=10 width=10 fill="white" stroke="green"></rect>
@@ -24,8 +26,7 @@
             </g>
 
             <g v-if="selectedItem.type === 'line'">
-                <line :x1="selectedItem.x1" :x2="selectedItem.x2" :y1="selectedItem.y1" :y2="selectedItem.y2" stroke="green"></line>
-                <line @pointerdown="downHandle($event, selectedItem, '-')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, '-')"  :x1="selectedItem.x1" :x2="selectedItem.x2" :y1="selectedItem.y1" :y2="selectedItem.y2" stroke="rgba(0,0,0,0)" stroke-width="10"></line>
+                <line style="pointer-events: none;" :x1="selectedItem.x1" :x2="selectedItem.x2" :y1="selectedItem.y1" :y2="selectedItem.y2" stroke="green"></line>
                 <rect @pointerdown="downHandle($event, selectedItem, 's')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, 's')" :x="-5 + selectedItem.x1" :y="-5 + selectedItem.y1" height=10 width=10 fill="white" stroke="green"></rect>
                 <rect @pointerdown="downHandle($event, selectedItem, 'e')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, 'e')"  :x="-5 + selectedItem.x2" :y="-5 + selectedItem.y2" height=10 width=10 fill="white" stroke="green"></rect>
             </g>
