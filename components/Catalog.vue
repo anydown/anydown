@@ -1,15 +1,19 @@
 <template>
     <div>
         <!-- <CodeBlockKanban :input="Hello"></CodeBlockKanban> -->
+        <code-block-block :input="exampleGantt"></code-block-block>
         <code-block-gantt :input="exampleGantt"></code-block-gantt>
         <code-block-kanban :input="exampleKanban"></code-block-kanban>
         <code-block-csv :input="exampleSpreadSheet"/>
     </div>
 </template>
 <script>
+
+
 import CodeBlockKanban from "./CodeBlockKanban.vue";
 import CodeBlockGantt from "./CodeBlockGantt.vue";
 import CodeBlockCsv from "./CodeBlockCsv.vue";
+import CodeBlockBlock from "./CodeBlockBlock.vue";
 
 const exampleGantt = `
 gantt
@@ -35,7 +39,8 @@ export default {
   components: {
     CodeBlockKanban,
     CodeBlockGantt,
-    CodeBlockCsv
+    CodeBlockCsv,
+    CodeBlockBlock
   },
   data() {
     return {
