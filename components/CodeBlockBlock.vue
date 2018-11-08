@@ -60,7 +60,14 @@
 <script>
 const handleSize = 10 / 2;
 
+function round(v) {
+  return Math.round(v / 10) * 10;
+}
+
 export default {
+  props: {
+    input: String
+  },
   methods: {
     downArrow(ev, item, x, y) {
       this.createArrowPos = {
@@ -85,11 +92,12 @@ export default {
     upArrow(ev) {
       this.items.push({
         type: "line",
-        x1: this.createArrowPos.x1,
-        x2: this.createArrowPos.x2,
-        y1: this.createArrowPos.y1,
-        y2: this.createArrowPos.y2
+        x1: round(this.createArrowPos.x1),
+        x2: round(this.createArrowPos.x2),
+        y1: round(this.createArrowPos.y1),
+        y2: round(this.createArrowPos.y2)
       });
+      this.$emit("change", this.stringData);
 
       this.createArrow = false;
     },
@@ -100,33 +108,33 @@ export default {
         var y = ev.clientY - target_rect.top;
 
         if (type === "x") {
-          item.x = ev.offsetX - this.dragOffset.x;
-          item.y = ev.offsetY - this.dragOffset.y;
+          item.x = round(ev.offsetX - this.dragOffset.x);
+          item.y = round(ev.offsetY - this.dragOffset.y);
         }
         if (type === "-") {
           const dx = item.x2 - item.x1;
           const dy = item.y2 - item.y1;
 
           if (dx > 0) {
-            item.x1 = ev.offsetX - this.dragOffset.x;
+            item.x1 = round(ev.offsetX - this.dragOffset.x);
           } else {
-            item.x1 = ev.offsetX - this.dragOffset.x - dx;
+            item.x1 = round(ev.offsetX - this.dragOffset.x - dx);
           }
           if (dy > 0) {
-            item.y1 = ev.offsetY - this.dragOffset.y;
+            item.y1 = round(ev.offsetY - this.dragOffset.y);
           } else {
-            item.y1 = ev.offsetY - this.dragOffset.y - dy;
+            item.y1 = round(ev.offsetY - this.dragOffset.y - dy);
           }
-          item.x2 = item.x1 + dx;
-          item.y2 = item.y1 + dy;
+          item.x2 = round(item.x1 + dx);
+          item.y2 = round(item.y1 + dy);
         }
         if (type === "s") {
-          item.x1 = ev.offsetX - this.dragOffset.x;
-          item.y1 = ev.offsetY - this.dragOffset.y;
+          item.x1 = round(ev.offsetX - this.dragOffset.x);
+          item.y1 = round(ev.offsetY - this.dragOffset.y);
         }
         if (type === "e") {
-          item.x2 = ev.offsetX - this.dragOffset.x;
-          item.y2 = ev.offsetY - this.dragOffset.y;
+          item.x2 = round(ev.offsetX - this.dragOffset.x);
+          item.y2 = round(ev.offsetY - this.dragOffset.y);
         }
 
         if (type.indexOf("l") >= 0) {
@@ -153,6 +161,7 @@ export default {
     },
     upHandle(ev) {
       this.dragging = false;
+      this.$emit("change", this.stringData);
     },
     downHandle(ev, item, type) {
       var target_rect = ev.currentTarget.getBoundingClientRect();
@@ -183,17 +192,87 @@ export default {
         text: "item"
       });
       this.selectedIndex = this.items.length - 1;
+      this.$emit("change", this.stringData);
     },
     changeBoxText(item) {
       const text = window.prompt("テキスト入力", item.text);
       if (text) {
         item.text = text;
       }
+      this.$emit("change", this.stringData);
+    },
+    updateData(input) {
+      let data = this.input
+        .split(/[\r|\n|\r\n]/)
+        .filter(item => item.length > 0)
+        .map(i => {
+          const m = i.split(" ");
+          if (m[0] === "-") {
+            return {
+              type: "box",
+              text: m[1],
+              x: +m[2],
+              y: +m[3],
+              width: +m[4],
+              height: +m[5]
+            };
+          }
+          if (m[0] === ">") {
+            return {
+              type: "line",
+              text: m[1],
+              x1: +m[2],
+              y1: +m[3],
+              x2: +m[4],
+              y2: +m[5]
+            };
+          }
+          // const m = i.match(/- (.+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)/);
+          // if (m) {
+          //   return {
+          //     type: "box",
+          //     text: m[1],
+          //     x: +m[2],
+          //     y: +m[3],
+          //     width: +m[4],
+          //     height: +m[5]
+          //   };
+          // }
+          // const arrow = i.match(/> (.+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)/);
+          // if (arrow) {
+          //   return {
+          //     type: "line",
+          //     text: arrow[1],
+          //     x1: +arrow[2],
+          //     y1: +arrow[3],
+          //     x2: +arrow[4],
+          //     y2: +arrow[5]
+          //   };
+          // }
+        })
+        .filter(item => item);
+
+      this.items = data;
     }
   },
   computed: {
     selectedItem() {
       return this.items[this.selectedIndex];
+    },
+    stringData() {
+      return `block
+${this.items
+        .map(i => {
+          if (i.type === "box") {
+            return "- " + [i.text, i.x, i.y, i.width, i.height].join(" ");
+          }
+          if (i.type === "line") {
+            return "> " + [i.text, i.x1, i.y1, i.x2, i.y2].join(" ");
+          }
+          return "";
+        })
+        .join("\n")}
+`;
     }
   },
   data() {
@@ -209,17 +288,16 @@ export default {
         y: 0
       },
       selectedIndex: 0,
-      items: [
-        {
-          type: "box",
-          x: 20,
-          y: 30,
-          width: 200,
-          height: 100,
-          text: "test"
-        }
-      ]
+      items: []
     };
+  },
+  mounted() {
+    this.updateData(this.input);
+  },
+  watch: {
+    input(input) {
+      this.updateData(input);
+    }
   }
 };
 </script>
