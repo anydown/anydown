@@ -7,13 +7,18 @@
                 <foreignObject :height="item.height" :width="item.width" x="0" y="0">
                     <div class="innerText" v-text="item.text"></div>
                 </foreignObject>
-                <rect @pointerdown="downHandle($event, item, 'x')" @pointerup="upHandle" @pointermove="moveHandle($event, item, 'x')"  fill="rgba(255,255,255,0)" x=0.5 y=0.5 :height="item.height" :width="item.width"></rect>
+                <rect @dblclick="changeBoxText(item)" @pointerdown="downHandle($event, item, 'x')" @pointerup="upHandle" @pointermove="moveHandle($event, item, 'x')"  fill="rgba(255,255,255,0)" x=0.5 y=0.5 :height="item.height" :width="item.width"></rect>
 
             </g>
 
             <g v-if="item.type === 'line'" @pointerdown="downHandle($event, item, '-')" @pointerup="upHandle" @pointermove="moveHandle($event, item, '-')">
                 <line :x1="item.x1" :x2="item.x2" :y1="item.y1" :y2="item.y2" stroke="rgba(0,0,0,0)" stroke-width="10"></line>
                 <line :x1="item.x1" :x2="item.x2" :y1="item.y1" :y2="item.y2" stroke="black"></line>
+                <g style="pointer-events: none;" :transform="`translate(${item.x2}, ${item.y2})`" >
+                  <g :transform="`rotate(${Math.atan2(item.y2 - item.y1, item.x2 - item.x1) / 2 / Math.PI * 360})`">
+                    <polygon points="0,0 -20,-8 -18,0 -20,8" fill="black" />
+                  </g>
+                </g>
             </g>
         </g>
 
@@ -24,12 +29,21 @@
                 <rect @pointerdown="downHandle($event, selectedItem, 'tl')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, 'tr')" :x="-5 + selectedItem.width" y=-5 height=10 width=10 fill="white" stroke="green"></rect>
                 <rect @pointerdown="downHandle($event, selectedItem, 'dr')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, 'dr')" :x="-5 + selectedItem.width" :y="-5 + selectedItem.height" height=10 width=10 fill="white" stroke="green"></rect>
                 <rect @pointerdown="downHandle($event, selectedItem, 'dl')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, 'dl')"  :x="-5" :y="-5 + selectedItem.height" height=10 width=10 fill="white" stroke="green"></rect>
+
+                <circle @pointerdown="downArrow($event, selectedItem, 0, selectedItem.height / 2)" @pointerup="upArrow" @pointermove="moveArrow($event)" :cx="0" :cy="selectedItem.height / 2" r=6 fill="rgba(100,200,100, 0.5)"></circle>
+                <circle @pointerdown="downArrow($event, selectedItem, selectedItem.width, selectedItem.height / 2)" @pointerup="upArrow" @pointermove="moveArrow($event)" :cx="selectedItem.width" :cy="selectedItem.height / 2" r=6 fill="rgba(100,200,100, 0.5)"></circle>
+                <circle @pointerdown="downArrow($event, selectedItem, selectedItem.width / 2, 0)" @pointerup="upArrow" @pointermove="moveArrow($event)" :cx="selectedItem.width / 2" :cy="0" r=6 fill="rgba(100,200,100, 0.5)"></circle>
+                <circle @pointerdown="downArrow($event, selectedItem, selectedItem.width / 2, selectedItem.height)" @pointerup="upArrow" @pointermove="moveArrow($event)" :cx="selectedItem.width / 2" :cy="selectedItem.height" r=6 fill="rgba(100,200,100, 0.5)"></circle>
             </g>
 
             <g v-if="selectedItem.type === 'line'">
                 <line style="pointer-events: none;" :x1="selectedItem.x1" :x2="selectedItem.x2" :y1="selectedItem.y1" :y2="selectedItem.y2" stroke="green"></line>
                 <rect @pointerdown="downHandle($event, selectedItem, 's')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, 's')" :x="-5 + selectedItem.x1" :y="-5 + selectedItem.y1" height=10 width=10 fill="white" stroke="green"></rect>
                 <rect @pointerdown="downHandle($event, selectedItem, 'e')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, 'e')"  :x="-5 + selectedItem.x2" :y="-5 + selectedItem.y2" height=10 width=10 fill="white" stroke="green"></rect>
+            </g>
+
+            <g v-if="createArrow">
+                <line :x1="createArrowPos.x1" :x2="createArrowPos.x2" :y1="createArrowPos.y1" :y2="createArrowPos.y2" stroke="green"></line>
             </g>
         </g>
 
@@ -48,6 +62,37 @@ const handleSize = 10 / 2;
 
 export default {
   methods: {
+    downArrow(ev, item, x, y) {
+      this.createArrowPos = {
+        x1: item.x + x,
+        y1: item.y + y,
+        x2: item.x + x,
+        y2: item.y + y
+      };
+
+      var el = ev.currentTarget;
+      el.setPointerCapture(ev.pointerId);
+      this.createArrow = true;
+    },
+    moveArrow(ev) {
+      var target_rect = this.$el.getBoundingClientRect();
+      var x = ev.clientX - target_rect.left;
+      var y = ev.clientY - target_rect.top;
+
+      this.createArrowPos.x2 = x;
+      this.createArrowPos.y2 = y;
+    },
+    upArrow(ev) {
+      this.items.push({
+        type: "line",
+        x1: this.createArrowPos.x1,
+        x2: this.createArrowPos.x2,
+        y1: this.createArrowPos.y1,
+        y2: this.createArrowPos.y2
+      });
+
+      this.createArrow = false;
+    },
     moveHandle(ev, item, type) {
       if (this.dragging) {
         var target_rect = ev.currentTarget.getBoundingClientRect();
@@ -138,6 +183,12 @@ export default {
         text: "item"
       });
       this.selectedIndex = this.items.length - 1;
+    },
+    changeBoxText(item) {
+      const text = window.prompt("テキスト入力", item.text);
+      if (text) {
+        item.text = text;
+      }
     }
   },
   computed: {
@@ -147,6 +198,11 @@ export default {
   },
   data() {
     return {
+      createArrow: false,
+      createArrowPos: {
+        x: 0,
+        y: 0
+      },
       dragging: false,
       dragOffset: {
         x: 0,
@@ -161,13 +217,6 @@ export default {
           width: 200,
           height: 100,
           text: "test"
-        },
-        {
-          type: "line",
-          x1: 10,
-          y1: 10,
-          x2: 100,
-          y2: 100
         }
       ]
     };
