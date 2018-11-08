@@ -50,8 +50,17 @@ export default {
         if (type === "-") {
           const dx = item.x2 - item.x1;
           const dy = item.y2 - item.y1;
-          item.x1 = ev.offsetX - this.dragOffset.x;
-          item.y1 = ev.offsetY - this.dragOffset.y;
+
+          if (dx > 0) {
+            item.x1 = ev.offsetX - this.dragOffset.x;
+          } else {
+            item.x1 = ev.offsetX - this.dragOffset.x - dx;
+          }
+          if (dy > 0) {
+            item.y1 = ev.offsetY - this.dragOffset.y;
+          } else {
+            item.y1 = ev.offsetY - this.dragOffset.y - dy;
+          }
           item.x2 = item.x1 + dx;
           item.y2 = item.y1 + dy;
         }
