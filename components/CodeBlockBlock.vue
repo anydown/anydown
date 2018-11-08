@@ -1,5 +1,6 @@
 <template>
     <svg height=400 width="600">
+
         <g v-for="(item, idx) in items" :key="idx" @pointerdown="selectedIndex = idx">
             <g v-if="item.type === 'box'" :transform="`translate(${item.x}, ${item.y})`">
                 <rect fill="white" stroke="black" x=0.5 y=0.5 :height="item.height" :width="item.width"></rect>
@@ -31,10 +32,20 @@
                 <rect @pointerdown="downHandle($event, selectedItem, 'e')" @pointerup="upHandle" @pointermove="moveHandle($event, selectedItem, 'e')"  :x="-5 + selectedItem.x2" :y="-5 + selectedItem.y2" height=10 width=10 fill="white" stroke="green"></rect>
             </g>
         </g>
+
+      <!-- タスク追加 -->
+      <g :transform="`translate(${600 - 24.5}, 5.5)`" @click="addBlock" style="cursor: pointer;">
+        <rect fill="white" stroke="#999" x=0 y=0 width=20 height=20 rx=4 ry=4></rect>
+        <line x1=10 x2=10 y1=5 y2=15 stroke="ForestGreen"></line>
+        <line x1=5 x2=15 y1=10 y2=10 stroke="ForestGreen"></line>
+      </g>
+
     </svg>
 </template>
 
 <script>
+const handleSize = 10 / 2;
+
 export default {
   methods: {
     moveHandle(ev, item, type) {
@@ -74,23 +85,23 @@ export default {
         }
 
         if (type.indexOf("l") >= 0) {
-          const dx = ev.offsetX - this.dragOffset.x + 5;
+          const dx = ev.offsetX - this.dragOffset.x + handleSize;
           const px = item.x - dx;
           item.x = dx;
           item.width += px;
         }
         if (type.indexOf("t") >= 0) {
-          const dy = ev.offsetY - this.dragOffset.y + 5;
+          const dy = ev.offsetY - this.dragOffset.y + handleSize;
           const py = item.y - dy;
           item.y = dy;
           item.height += py;
         }
         if (type.indexOf("d") >= 0) {
-          const my = ev.offsetY - this.dragOffset.y + 5;
+          const my = ev.offsetY - this.dragOffset.y + handleSize;
           item.height = my - item.y;
         }
         if (type.indexOf("r") >= 0) {
-          const mx = ev.offsetX - this.dragOffset.x + 5;
+          const mx = ev.offsetX - this.dragOffset.x + handleSize;
           item.width = mx - item.x;
         }
       }
@@ -108,7 +119,25 @@ export default {
       this.dragOffset.x = x;
       this.dragOffset.y = y;
       this.dragging = true;
-      console.log(ev, item, type);
+    },
+    addBlock() {
+      let px = 10;
+      let py = 10;
+      const boxes = this.items.filter(i => i.type === "box");
+      if (boxes.length > 0) {
+        const pitem = boxes[boxes.length - 1];
+        px = pitem.x;
+        py = pitem.y + pitem.height;
+      }
+      this.items.push({
+        type: "box",
+        x: px,
+        y: py,
+        width: 200,
+        height: 100,
+        text: "item"
+      });
+      this.selectedIndex = this.items.length - 1;
     }
   },
   computed: {
@@ -129,7 +158,7 @@ export default {
           type: "box",
           x: 20,
           y: 30,
-          width: 300,
+          width: 200,
           height: 100,
           text: "test"
         },
@@ -150,6 +179,7 @@ export default {
 svg {
   border: 1px solid #999;
   user-select: none;
+  background: #f0f0f0;
 }
 .innerText {
   margin: 0.5rem;
