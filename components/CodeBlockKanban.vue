@@ -5,9 +5,12 @@
       <div class="kanban__col-title" @dblclick="editTitle(colIndex)">{{col.name}}</div>
       <div class="kanban__wrapper">
         <draggable v-model="col.cards" :options="{group:'everykanban'}" class="draggable--max" @change="onEnd">
-          <div class="kanban__row" v-for="(card, index) in col.cards" track-by="index" :key="index" @dblclick="edit(colIndex, index)">
+          <div class="kanban__row" v-for="(card, index) in col.cards" track-by="index" :key="index" @dblclick="startEditing(colIndex, index)">
             <div class="kanban__row__remove" @click="removeTask(colIndex, index)">×</div>
-            {{card}}
+            <div class="kanban__row__label" v-if="!(editing && editingCol === colIndex && editingIndex === index)" v-text="card"></div>
+            <form v-if="editing && editingCol === colIndex && editingIndex === index" @submit.prevent="endEditingAndNew(colIndex, index)" style="margin: 0;">
+              <input class="kanban__row__input" v-model="editingText" @blur="endEditing(colIndex, index)" />
+            </form>
           </div>
         </draggable>
       </div>
@@ -26,7 +29,11 @@ export default {
   },
   data() {
     return {
-      compiled: []
+      compiled: [],
+      editingText: "",
+      editing: false,
+      editingCol: 0,
+      editingIndex: 0
     };
   },
   watch: {
@@ -49,29 +56,44 @@ export default {
     onEnd() {
       this.$emit("change", compiler.serializeKanban(this.compiled));
     },
-    edit(col, row) {
+    startEditing(col, row) {
       const oldData = this.compiled[col].cards[row];
-      const task = window.prompt("タスク名入力", oldData);
-      if (task) {
-        this.$set(this.compiled[col].cards, row, task);
+      this.editingCol = col;
+      this.editingIndex = row;
+      this.editingText = oldData;
+      this.editing = true;
+      this.$nextTick(() => {
+        const el = this.$el.querySelector(".kanban__row__input");
+        if (el) {
+          el.focus();
+        }
+      });
+    },
+    endEditing(col, row) {
+      this.editing = false;
+      if (this.editingText === "") {
+        // this.$nextTick(()=>{
+        this.removeTask(col, row);
+        // })
+      } else {
+        this.$set(this.compiled[col].cards, row, this.editingText);
         this.$emit("change", compiler.serializeKanban(this.compiled));
       }
     },
+    endEditingAndNew(col, row) {
+      this.endEditing(col, row);
+      this.$nextTick(() => {
+        this.addTask(col);
+      });
+    },
     addTask(col) {
-      const task = window.prompt("タスク名入力", "");
-      if (task) {
-        this.compiled[col].cards.push(task);
-        this.$emit("change", compiler.serializeKanban(this.compiled));
-      }
+      this.compiled[col].cards.push("");
+      this.startEditing(col, this.compiled[col].cards.length - 1);
     },
     removeTask(col, row) {
       const oldData = this.compiled[col].cards[row];
-      if (
-        window.confirm("下記のタスクを削除してよろしいですか？：\n" + oldData)
-      ) {
-        this.$delete(this.compiled[col].cards, row);
-        this.$emit("change", compiler.serializeKanban(this.compiled));
-      }
+      this.$delete(this.compiled[col].cards, row);
+      this.$emit("change", compiler.serializeKanban(this.compiled));
     },
     editTitle(col) {
       const listName = window.prompt("リスト名を変更", this.compiled[col].name);
@@ -151,6 +173,16 @@ export default {
   line-height: 1.6rem;
   word-break: break-all;
   position: relative;
+}
+
+.kanban__row__input {
+  font-size: 1rem;
+  font-family: inherit;
+  width: 100%;
+}
+
+.kanban__row__label {
+  min-height: 1.5rem;
 }
 
 .kanban__wrapper {
