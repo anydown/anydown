@@ -1,3 +1,5 @@
+import { ganttExample, csvExample, blockExample } from "./menu";
+
 export const example = `# anydown
 
 ---
@@ -36,19 +38,21 @@ export const example = `# anydown
 
 # ガントチャート機能
 
-まだ簡易実装だけど、直近２週間のガントチャートを表示出来る
+直近２週間のガントチャートを表示出来る
 
-\`\`\`gantt
-タスクA 2017-11-01 2017-11-02
-タスクB 2017-11-03 2017-11-05
-タスクC 2017-11-10 2017-11-15
-\`\`\`
+${ganttExample}
 
-表示区間や、月間予定なども表示できたら良さそうだけど、まだ検討中…
+# スプレッドシート
+
+${csvExample}
+
+# ブロック図エディタ
+
+${blockExample}
 
 # たぶん実装されない機能
 
 - アラーム機能などは実装されない（Googleカレンダーの方が便利）
 - カレンダー機能は実装されない（同上）
 
-`
+`;
