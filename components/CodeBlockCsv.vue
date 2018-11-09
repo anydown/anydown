@@ -165,8 +165,8 @@ ${this.data.map(i => i.join(",")).join("\n")}
       this.headerResizeAt = -1;
     },
     headerResizeMove(e) {
-      var headerRect = e.target.parentNode.parentNode.getBoundingClientRect();
-      var headerMouseX = e.clientX - headerRect.left;
+      const headerRect = e.target.parentNode.parentNode.getBoundingClientRect();
+      const headerMouseX = e.clientX - headerRect.left;
       if (this.headerResizeAt >= 0) {
         const updateWidth =
           headerMouseX - this.positionLeft(this.headerResizeAt);
