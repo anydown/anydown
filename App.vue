@@ -3,20 +3,20 @@
     <vue-split-pane :min-percent='20' :default-percent='40' split="vertical">
       <template slot="paneL">
         <div class="paneL__wrapper">
+          <div class="paneL__editor">
+            <codemirror ref="codemirror" id="input" v-model="input" :options="codeMirrorOption"></codemirror>
+          </div>
           <div class="paneL__nav">
             <div class="paneL__insertMenu">
-              <button class="insertButton" @click="insertExampleKanban"><span class="insertButton__plus">+</span> Kanban</button>
-              <button class="insertButton" @click="insertExampleGantt"><span class="insertButton__plus">+</span> Gantt</button>
+              <button class="insertButton" @click="insertExampleKanban"><span class="insertButton__plus">+</span> カンバン</button>
+              <button class="insertButton" @click="insertExampleGantt"><span class="insertButton__plus">+</span> ガント</button>
               <button class="insertButton" @click="insertExampleCsv"><span class="insertButton__plus">+</span> CSV</button>
-              <button class="insertButton" @click="insertExampleBlock"><span class="insertButton__plus">+</span> Block</button>
-              <button v-if="installPwaButtonVisible" class="installPwaButton" @click="installPwa">Install PWA</button>
+              <button class="insertButton" @click="insertExampleBlock"><span class="insertButton__plus">+</span> ブロック図</button>
+              <!-- <button v-if="installPwaButtonVisible" class="installPwaButton" @click="installPwa">Install PWA</button> -->
             </div>
             <div class="paneL__mode">
               LocalStorage Mode
             </div>
-          </div>
-          <div class="paneL__editor">
-            <codemirror ref="codemirror" id="input" v-model="input" :options="codeMirrorOption"></codemirror>
           </div>
         </div>
       </template>
@@ -195,9 +195,15 @@ body,
 
 .insertButton {
   background: white;
-  border: 1px solid #999;
+  border: 0px solid #999;
   padding: 0.25rem 0.75rem;
+  font-weight: 600;
 }
+
+.insertButton:hover {
+  background: #eee;
+}
+
 .installPwaButton {
   background: #c8ffc1;
   border: 1px solid #999;
