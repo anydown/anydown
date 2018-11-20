@@ -65,6 +65,7 @@ import {
   csvExample,
   blockExample
 } from "./util/menu";
+import * as db from "./util/local-db";
 
 import { codemirror } from "vue-codemirror-lite";
 import VueSplitPane from "vue-splitpane";
@@ -72,9 +73,6 @@ import VueSplitPane from "vue-splitpane";
 import "codemirror/mode/markdown/markdown";
 import "codemirror/addon/edit/continuelist.js";
 import "codemirror/theme/monokai.css";
-
-const LOCALSTORAGE_KEY = "anydown_items";
-const LOCALSTORAGE_LAST_EDITED_FILE = "anydown_last_edited_file";
 
 const filters = [
   {
@@ -84,30 +82,6 @@ const filters = [
 ];
 
 let deferredPrompt;
-
-function saveLocalStorage(key, data) {
-  let storage = loadLocalStorage();
-  if (storage) {
-    storage[key] = data;
-  } else {
-    storage = {};
-  }
-  localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(storage));
-}
-
-function saveLocalStorageAll(data) {
-  localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data));
-}
-
-function loadLocalStorage() {
-  const data = localStorage.getItem(LOCALSTORAGE_KEY);
-  if (data) {
-    return JSON.parse(data);
-  }
-  return {
-    default: example
-  };
-}
 
 export default {
   name: "app",
@@ -147,13 +121,14 @@ export default {
   watch: {
     input() {
       this.checkDirty();
-      saveLocalStorage(this.path, this.input);
+      db.saveLocalStorage(this.path, this.input);
+      this.localStorageItems = db.loadLocalStorage();
 
       this.splited = compile(this.input);
     },
     path(val) {
       this.lastEdited = val;
-      localStorage.setItem(LOCALSTORAGE_LAST_EDITED_FILE, this.lastEdited);
+      localStorage.setItem(db.LOCALSTORAGE_LAST_EDITED_FILE, this.lastEdited);
       document.title = "anydown - " + this.path;
     }
   },
@@ -217,15 +192,18 @@ export default {
           return;
         }
         this.path = text;
-        saveLocalStorage(this.path, "# " + this.path);
-        this.localStorageItems = loadLocalStorage();
+        db.saveLocalStorage(this.path, "# " + this.path);
+        this.localStorageItems = db.loadLocalStorage();
         this.input = this.localStorageItems[this.path];
       }
     },
     removeLocalStorageItem(f) {
       if (window.confirm("選択中のメモを削除してもよろしいですか？")) {
         this.$delete(this.localStorageItems, f);
-        saveLocalStorageAll(this.localStorageItems);
+        db.saveLocalStorageAll(this.localStorageItems);
+        this.localStorageItems = db.loadLocalStorage();
+        this.path = this.localStorageList[0]
+        this.input = this.localStorageItems[this.path];
       }
     },
     selectFile(path) {
@@ -234,8 +212,8 @@ export default {
     }
   },
   mounted() {
-    const storage = loadLocalStorage();
-    const lastEdited = localStorage.getItem(LOCALSTORAGE_LAST_EDITED_FILE);
+    const storage = db.loadLocalStorage();
+    const lastEdited = localStorage.getItem(db.LOCALSTORAGE_LAST_EDITED_FILE);
     if (lastEdited) {
       this.input = storage[lastEdited];
       this.path = lastEdited;
