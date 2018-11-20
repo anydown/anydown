@@ -1,8 +1,20 @@
 <template>
   <div class="app">
+    <div class="modeSwitcher">
+      <div class="modeSwitcher__item" :class="{'active': mode === 'editor'}" @click="toggleMode('editor')">
+        <svg class="modeSwitcher__item__icon" id="i-edit" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
+            <path d="M30 7 L25 2 5 22 3 29 10 27 Z M21 6 L26 11 Z M5 22 L10 27 Z" />
+        </svg>
+      </div>
+      <div class="modeSwitcher__item" :class="{'active': mode === 'file'}" @click="toggleMode('file')">
+        <svg class="modeSwitcher__item__icon" id="i-folder" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
+            <path d="M2 26 L30 26 30 7 14 7 10 4 2 4 Z M30 12 L2 12" />
+        </svg>
+      </div>
+    </div>
     <vue-split-pane :min-percent='20' :default-percent='40' split="vertical">
       <template slot="paneL">
-        <div class="paneL__wrapper">
+        <div class="paneL__wrapper" v-if="mode === 'editor'">
           <div class="paneL__editor">
             <codemirror ref="codemirror" id="input" v-model="input" :options="codeMirrorOption"></codemirror>
           </div>
@@ -14,9 +26,16 @@
               <button class="insertButton" @click="insertExampleBlock"><span class="insertButton__plus">+</span> ブロック図</button>
               <!-- <button v-if="installPwaButtonVisible" class="installPwaButton" @click="installPwa">Install PWA</button> -->
             </div>
-            <div class="paneL__mode">
-              LocalStorage Mode
+          </div>
+        </div>
+        <div class="paneL__wrapper" v-if="mode === 'file'">
+          <div class="paneL__file">
+            <div class="paneL__file__section">
+              <div class="paneL__file__section__label">LOCAL STORAGE</div>
+              <div class="paneL__file__section__action" @click="addLocalStorageItem">+</div>
+              <div class="paneL__file__section__action" @click="removeLocalStorageItem(path)">-</div>
             </div>
+            <div class="paneL__file__item" @dblclick="mode = 'editor'" @click="selectFile(f)" :class="{'active': path === f}" v-for="(f, index) in localStorageList" :key="index" v-text="f"></div>
           </div>
         </div>
       </template>
@@ -46,6 +65,7 @@ import {
   csvExample,
   blockExample
 } from "./util/menu";
+import * as db from "./util/local-db";
 
 import { codemirror } from "vue-codemirror-lite";
 import VueSplitPane from "vue-splitpane";
@@ -53,9 +73,6 @@ import VueSplitPane from "vue-splitpane";
 import "codemirror/mode/markdown/markdown";
 import "codemirror/addon/edit/continuelist.js";
 import "codemirror/theme/monokai.css";
-
-const LOCALSTORAGE_KEY = "anydown_data";
-const LOCALSTORAGE_LAST_EDITED_FILE = "anydown_last_edited_file";
 
 const filters = [
   {
@@ -70,6 +87,8 @@ export default {
   name: "app",
   data() {
     return {
+      mode: "editor",
+      localStorageItems: {},
       input: "",
       originalInput: "",
       splited: [],
@@ -94,13 +113,23 @@ export default {
     },
     editor() {
       return this.$refs.codemirror.editor;
+    },
+    localStorageList() {
+      return Object.keys(this.localStorageItems);
     }
   },
   watch: {
     input() {
       this.checkDirty();
-      localStorage.setItem(LOCALSTORAGE_KEY, this.input);
+      db.saveLocalStorage(this.path, this.input);
+      this.localStorageItems = db.loadLocalStorage();
+
       this.splited = compile(this.input);
+    },
+    path(val) {
+      this.lastEdited = val;
+      localStorage.setItem(db.LOCALSTORAGE_LAST_EDITED_FILE, this.lastEdited);
+      document.title = "anydown - " + this.path;
     }
   },
   methods: {
@@ -111,11 +140,6 @@ export default {
     updateBlock(a, b) {
       this.splited[b].text = a;
       this.input = this.splited.map(i => i.text).join("```");
-    },
-    loadExample() {
-      if (window.confirm("現在のノートを破棄しますが、よろしいですか？")) {
-        this.input = example;
-      }
     },
     resetDirtyFlag() {
       this.originalInput = this.input;
@@ -149,15 +173,55 @@ export default {
         }
         deferredPrompt = null;
       });
+    },
+    toggleMode(mode) {
+      // comment out because vue-split-pane doesn't support collapse for now
+      // should we rewrite split pane?
+      // if(this.mode === mode){
+      //   this.mode = ""
+      // }else{
+      //   this.mode = mode;
+      // }
+      this.mode = mode;
+    },
+    addLocalStorageItem() {
+      const text = window.prompt("新規メモのタイトル");
+      if (text) {
+        if (this.localStorageList.indexOf(text) >= 0) {
+          alert("タイトルが重複しています。");
+          return;
+        }
+        this.path = text;
+        db.saveLocalStorage(this.path, "# " + this.path);
+        this.localStorageItems = db.loadLocalStorage();
+        this.input = this.localStorageItems[this.path];
+      }
+    },
+    removeLocalStorageItem(f) {
+      if (window.confirm("選択中のメモを削除してもよろしいですか？")) {
+        this.$delete(this.localStorageItems, f);
+        db.saveLocalStorageAll(this.localStorageItems);
+        this.localStorageItems = db.loadLocalStorage();
+        this.path = this.localStorageList[0]
+        this.input = this.localStorageItems[this.path];
+      }
+    },
+    selectFile(path) {
+      this.path = path;
+      this.input = this.localStorageItems[path];
     }
   },
   mounted() {
-    const storage = localStorage.getItem(LOCALSTORAGE_KEY);
-    if (storage) {
-      this.input = storage;
+    const storage = db.loadLocalStorage();
+    const lastEdited = localStorage.getItem(db.LOCALSTORAGE_LAST_EDITED_FILE);
+    if (lastEdited) {
+      this.input = storage[lastEdited];
+      this.path = lastEdited;
     } else {
-      this.input = example;
+      this.input = storage["default"];
+      this.path = "default";
     }
+    this.localStorageItems = storage;
 
     window.addEventListener("beforeinstallprompt", e => {
       e.preventDefault();
@@ -233,6 +297,48 @@ body,
 }
 .insertButton__plus {
   color: #8acc6b;
+}
+
+.paneL__file {
+  background: #252525;
+  flex: 1;
+  font-size: 0.8rem;
+  color: #eee;
+}
+.paneL__file__section {
+  line-height: 1.6rem;
+  background: #333;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #999;
+  padding: 0 0.5rem;
+  display: flex;
+}
+.paneL__file__section__label {
+  flex: 1;
+}
+.paneL__file__section__action {
+  width: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  background: #444;
+  cursor: pointer;
+}
+
+.paneL__file__item {
+  line-height: 1.6rem;
+  font-size: 0.8rem;
+  color: #eee;
+  padding: 0 1rem;
+  cursor: pointer;
+}
+
+.paneL__file__item:hover {
+  background: #333;
+}
+
+.paneL__file__item.active {
+  background: rgb(103, 71, 134);
 }
 
 .paneL__editor {
@@ -322,6 +428,28 @@ code {
 
 .app {
   height: 100%;
+  display: flex;
+}
+.vue-splitter-container {
+  flex: 1;
+}
+
+.modeSwitcher {
+  background: #333;
+  display: flex;
+  flex-direction: column;
+}
+
+.modeSwitcher__item {
+  color: #999;
+}
+.modeSwitcher__item.active {
+  color: #fff;
+}
+
+.modeSwitcher__item__icon {
+  margin: 0.5rem;
+  display: inline-block;
 }
 
 .droppable {
