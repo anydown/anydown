@@ -60,6 +60,15 @@
 <script>
 const handleSize = 10 / 2;
 
+function isHit(box, x, y) {
+  return (
+    box.x <= x &&
+    x <= box.x + box.width &&
+    box.y <= y &&
+    y <= box.y + box.height
+  );
+}
+
 function round(v) {
   return Math.round(v / 10) * 10;
 }
@@ -101,6 +110,19 @@ export default {
 
       this.createArrow = false;
     },
+    moveAffectedLines(affected, dx, dy, isStart){
+      if(isStart){
+        affected.forEach(i => {
+          i.x1 += dx;
+          i.y1 += dy;
+        });
+      }else{
+        affected.forEach(i => {
+          i.x2 += dx;
+          i.y2 += dy;
+        });
+      }
+    },
     moveHandle(ev, item, type) {
       if (this.dragging) {
         var target_rect = ev.currentTarget.getBoundingClientRect();
@@ -108,8 +130,26 @@ export default {
         var y = ev.clientY - target_rect.top;
 
         if (type === "x") {
-          item.x = round(ev.offsetX - this.dragOffset.x);
-          item.y = round(ev.offsetY - this.dragOffset.y);
+          const nx = round(ev.offsetX - this.dragOffset.x);
+          const ny = round(ev.offsetY - this.dragOffset.y);
+
+          //Arrow Start
+          const affectedStart = this.items
+            .filter(i => i.type === "line")
+            .filter(i => {
+              return isHit(item, i.x1, i.y1);
+            });
+          this.moveAffectedLines(affectedStart, nx - item.x, ny - item.y, true)
+          //Arrow End
+          const affectedEnd = this.items
+            .filter(i => i.type === "line")
+            .filter(i => {
+              return isHit(item, i.x2, i.y2);
+            });
+          this.moveAffectedLines(affectedEnd, nx - item.x, ny - item.y, false)
+
+          item.x = nx;
+          item.y = ny;
         }
         if (type === "-") {
           const dx = item.x2 - item.x1;
