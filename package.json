@@ -23,6 +23,7 @@
   },
   "scripts": {
     "build": "parcel build index.html",
-    "catalog": "parcel catalog.html"
+    "catalog": "parcel catalog.html",
+    "dev": "parcel index.html"
   }
 }
