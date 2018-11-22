@@ -1,5 +1,5 @@
 <template>
-    <svg height=400 width="600" tabindex="0" @focus="editorFocus" @blur="editorBlur" @keydown="globalKeydown" touch-action="none">
+    <svg ref="canv" height=400 width="600" tabindex="0" @focus="editorFocus" @blur="editorBlur" @keydown="globalKeydown" touch-action="none">
 
         <g v-for="(item, idx) in items" :key="idx" @pointerdown="selectedIndex = idx">
             <g v-if="item.type === 'box'" :transform="`translate(${item.x}, ${item.y})`">
@@ -123,15 +123,25 @@ export default {
         });
       }
     },
+    getSvgOffset(e) {
+      const svg = this.$refs.canv;
+      const pt = svg.createSVGPoint();
+      //スクリーン座標を取得
+      pt.x = e.clientX;
+      pt.y = e.clientY;
+      return pt.matrixTransform(svg.getScreenCTM().inverse());
+    },
     moveHandle(ev, item, type) {
       if (this.dragging) {
         const target_rect = ev.currentTarget.getBoundingClientRect();
         const x = ev.clientX - target_rect.left;
         const y = ev.clientY - target_rect.top;
 
+        const svgOffset = this.getSvgOffset(ev);
+
         if (type === "x") {
-          const nx = round(ev.offsetX - this.dragOffset.x);
-          const ny = round(ev.offsetY - this.dragOffset.y);
+          const nx = round(svgOffset.x - this.dragOffset.x);
+          const ny = round(svgOffset.y - this.dragOffset.y);
 
           //Arrow Start
           const affectedStart = this.items
@@ -156,45 +166,45 @@ export default {
           const dy = item.y2 - item.y1;
 
           if (dx > 0) {
-            item.x1 = round(ev.offsetX - this.dragOffset.x);
+            item.x1 = round(svgOffset.x - this.dragOffset.x);
           } else {
-            item.x1 = round(ev.offsetX - this.dragOffset.x - dx);
+            item.x1 = round(svgOffset.x - this.dragOffset.x - dx);
           }
           if (dy > 0) {
-            item.y1 = round(ev.offsetY - this.dragOffset.y);
+            item.y1 = round(svgOffset.y - this.dragOffset.y);
           } else {
-            item.y1 = round(ev.offsetY - this.dragOffset.y - dy);
+            item.y1 = round(svgOffset.y - this.dragOffset.y - dy);
           }
           item.x2 = round(item.x1 + dx);
           item.y2 = round(item.y1 + dy);
         }
         if (type === "s") {
-          item.x1 = round(ev.offsetX - this.dragOffset.x);
-          item.y1 = round(ev.offsetY - this.dragOffset.y);
+          item.x1 = round(svgOffset.x - this.dragOffset.x);
+          item.y1 = round(svgOffset.y - this.dragOffset.y);
         }
         if (type === "e") {
-          item.x2 = round(ev.offsetX - this.dragOffset.x);
-          item.y2 = round(ev.offsetY - this.dragOffset.y);
+          item.x2 = round(svgOffset.x - this.dragOffset.x);
+          item.y2 = round(svgOffset.y - this.dragOffset.y);
         }
 
         if (type.indexOf("l") >= 0) {
-          const dx = ev.offsetX - this.dragOffset.x + handleSize;
+          const dx = svgOffset.x - this.dragOffset.x + handleSize;
           const px = item.x - dx;
           item.x = dx;
           item.width += px;
         }
         if (type.indexOf("t") >= 0) {
-          const dy = ev.offsetY - this.dragOffset.y + handleSize;
+          const dy = svgOffset.y - this.dragOffset.y + handleSize;
           const py = item.y - dy;
           item.y = dy;
           item.height += py;
         }
         if (type.indexOf("d") >= 0) {
-          const my = ev.offsetY - this.dragOffset.y + handleSize;
+          const my = svgOffset.y - this.dragOffset.y + handleSize;
           item.height = my - item.y;
         }
         if (type.indexOf("r") >= 0) {
-          const mx = ev.offsetX - this.dragOffset.x + handleSize;
+          const mx = svgOffset.x - this.dragOffset.x + handleSize;
           item.width = mx - item.x;
         }
       }
@@ -298,14 +308,14 @@ export default {
     editorBlur() {
       this.selectedIndex = -1;
     },
-    removeItem(index){
-        this.items.splice(this.selectedIndex, 1);
-        this.selectedIndex = -1;
-        this.$emit("change", this.stringData);
+    removeItem(index) {
+      this.items.splice(this.selectedIndex, 1);
+      this.selectedIndex = -1;
+      this.$emit("change", this.stringData);
     },
     globalKeydown(ev) {
       if (ev.key === "Delete" && this.selectedItem) {
-        this.removeItem(this.selectedIndex)
+        this.removeItem(this.selectedIndex);
       }
     }
   },
@@ -364,5 +374,6 @@ svg {
 }
 .innerText {
   margin: 0.5rem;
+  pointer-events: none;
 }
 </style>
