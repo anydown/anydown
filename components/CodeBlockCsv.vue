@@ -298,7 +298,7 @@ ${this.data.map(i => i.join(",")).join("\n")}
       this.fixScroll();
     },
     moveInputCaretToEnd() {
-      var el = this.$refs["hiddenInput"];
+      const el = this.$refs["hiddenInput"];
       el.setSelectionRange(this.editingText.length, this.editingText.length);
     },
     fixScroll() {

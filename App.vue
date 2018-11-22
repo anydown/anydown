@@ -158,8 +158,8 @@ export default {
       this.insertText(blockExample);
     },
     insertText(text) {
-      var doc = this.editor.getDoc();
-      var cursor = doc.getCursor();
+      const doc = this.editor.getDoc();
+      const cursor = doc.getCursor();
       doc.replaceRange(text, cursor);
     },
     installPwa() {

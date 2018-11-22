@@ -86,14 +86,14 @@ export default {
         y2: item.y + y
       };
 
-      var el = ev.currentTarget;
+      const el = ev.currentTarget;
       el.setPointerCapture(ev.pointerId);
       this.createArrow = true;
     },
     moveArrow(ev) {
-      var target_rect = this.$el.getBoundingClientRect();
-      var x = ev.clientX - target_rect.left;
-      var y = ev.clientY - target_rect.top;
+      const target_rect = this.$el.getBoundingClientRect();
+      const x = ev.clientX - target_rect.left;
+      const y = ev.clientY - target_rect.top;
 
       this.createArrowPos.x2 = x;
       this.createArrowPos.y2 = y;
@@ -125,9 +125,9 @@ export default {
     },
     moveHandle(ev, item, type) {
       if (this.dragging) {
-        var target_rect = ev.currentTarget.getBoundingClientRect();
-        var x = ev.clientX - target_rect.left;
-        var y = ev.clientY - target_rect.top;
+        const target_rect = ev.currentTarget.getBoundingClientRect();
+        const x = ev.clientX - target_rect.left;
+        const y = ev.clientY - target_rect.top;
 
         if (type === "x") {
           const nx = round(ev.offsetX - this.dragOffset.x);
@@ -204,11 +204,11 @@ export default {
       this.$emit("change", this.stringData);
     },
     downHandle(ev, item, type) {
-      var target_rect = ev.currentTarget.getBoundingClientRect();
-      var x = ev.clientX - target_rect.left;
-      var y = ev.clientY - target_rect.top;
+      const target_rect = ev.currentTarget.getBoundingClientRect();
+      const x = ev.clientX - target_rect.left;
+      const y = ev.clientY - target_rect.top;
 
-      var el = ev.currentTarget;
+      const el = ev.currentTarget;
       el.setPointerCapture(ev.pointerId);
       this.dragOffset.x = x;
       this.dragOffset.y = y;
