@@ -1,5 +1,5 @@
 <template>
-    <svg height=400 width="600">
+    <svg height=400 width="600" tabindex="0" @focus="editorFocus" @blur="editorBlur" @keydown="globalKeydown" touch-action="none">
 
         <g v-for="(item, idx) in items" :key="idx" @pointerdown="selectedIndex = idx">
             <g v-if="item.type === 'box'" :transform="`translate(${item.x}, ${item.y})`">
@@ -110,13 +110,13 @@ export default {
 
       this.createArrow = false;
     },
-    moveAffectedLines(affected, dx, dy, isStart){
-      if(isStart){
+    moveAffectedLines(affected, dx, dy, isStart) {
+      if (isStart) {
         affected.forEach(i => {
           i.x1 += dx;
           i.y1 += dy;
         });
-      }else{
+      } else {
         affected.forEach(i => {
           i.x2 += dx;
           i.y2 += dy;
@@ -139,14 +139,14 @@ export default {
             .filter(i => {
               return isHit(item, i.x1, i.y1);
             });
-          this.moveAffectedLines(affectedStart, nx - item.x, ny - item.y, true)
+          this.moveAffectedLines(affectedStart, nx - item.x, ny - item.y, true);
           //Arrow End
           const affectedEnd = this.items
             .filter(i => i.type === "line")
             .filter(i => {
               return isHit(item, i.x2, i.y2);
             });
-          this.moveAffectedLines(affectedEnd, nx - item.x, ny - item.y, false)
+          this.moveAffectedLines(affectedEnd, nx - item.x, ny - item.y, false);
 
           item.x = nx;
           item.y = ny;
@@ -293,6 +293,20 @@ export default {
         .filter(item => item);
 
       this.items = data;
+    },
+    editorFocus() {},
+    editorBlur() {
+      this.selectedIndex = -1;
+    },
+    removeItem(index){
+        this.items.splice(this.selectedIndex, 1);
+        this.selectedIndex = -1;
+        this.$emit("change", this.stringData);
+    },
+    globalKeydown(ev) {
+      if (ev.key === "Delete" && this.selectedItem) {
+        this.removeItem(this.selectedIndex)
+      }
     }
   },
   computed: {
@@ -327,7 +341,7 @@ ${this.items
         x: 0,
         y: 0
       },
-      selectedIndex: 0,
+      selectedIndex: -1,
       items: []
     };
   },
