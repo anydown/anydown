@@ -158,8 +158,8 @@ export default {
             });
           this.moveAffectedLines(affectedEnd, nx - item.x, ny - item.y, false);
 
-          item.x = nx;
-          item.y = ny;
+          item.x = round(nx);
+          item.y = round(ny);
         }
         if (type === "-") {
           const dx = item.x2 - item.x1;
@@ -190,22 +190,22 @@ export default {
         if (type.indexOf("l") >= 0) {
           const dx = svgOffset.x - this.dragOffset.x + handleSize;
           const px = item.x - dx;
-          item.x = dx;
-          item.width += px;
+          item.x = round(dx);
+          item.width = round(item.width + px);
         }
         if (type.indexOf("t") >= 0) {
           const dy = svgOffset.y - this.dragOffset.y + handleSize;
           const py = item.y - dy;
-          item.y = dy;
-          item.height += py;
+          item.y = round(dy);
+          item.height = round(item.height + py);
         }
         if (type.indexOf("d") >= 0) {
           const my = svgOffset.y - this.dragOffset.y + handleSize;
-          item.height = my - item.y;
+          item.height = round(my - item.y);
         }
         if (type.indexOf("r") >= 0) {
           const mx = svgOffset.x - this.dragOffset.x + handleSize;
-          item.width = mx - item.x;
+          item.width = round(mx - item.x);
         }
       }
     },
