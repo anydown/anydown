@@ -1,18 +1,48 @@
 <template>
   <div class="app">
     <div class="modeSwitcher">
-      <div class="modeSwitcher__item" :class="{'active': mode === 'editor'}" @click="toggleMode('editor')">
-        <svg class="modeSwitcher__item__icon" id="i-edit" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
-            <path d="M30 7 L25 2 5 22 3 29 10 27 Z M21 6 L26 11 Z M5 22 L10 27 Z" />
+      <div
+        class="modeSwitcher__item"
+        :class="{'active': mode === 'editor'}"
+        @click="toggleMode('editor')"
+      >
+        <svg
+          class="modeSwitcher__item__icon"
+          id="i-edit"
+          viewBox="0 0 32 32"
+          width="32"
+          height="32"
+          fill="none"
+          stroke="currentcolor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+        >
+          <path d="M30 7 L25 2 5 22 3 29 10 27 Z M21 6 L26 11 Z M5 22 L10 27 Z"></path>
         </svg>
       </div>
-      <div class="modeSwitcher__item" :class="{'active': mode === 'file'}" @click="toggleMode('file')">
-        <svg class="modeSwitcher__item__icon" id="i-folder" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
-            <path d="M2 26 L30 26 30 7 14 7 10 4 2 4 Z M30 12 L2 12" />
+      <div
+        class="modeSwitcher__item"
+        :class="{'active': mode === 'file'}"
+        @click="toggleMode('file')"
+      >
+        <svg
+          class="modeSwitcher__item__icon"
+          id="i-folder"
+          viewBox="0 0 32 32"
+          width="32"
+          height="32"
+          fill="none"
+          stroke="currentcolor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+        >
+          <path d="M2 26 L30 26 30 7 14 7 10 4 2 4 Z M30 12 L2 12"></path>
         </svg>
       </div>
     </div>
-    <vue-split-pane :min-percent='20' :default-percent='40' split="vertical">
+    <vue-split-pane :min-percent="20" :default-percent="40" split="vertical">
       <template slot="paneL">
         <div class="paneL__wrapper" v-if="mode === 'editor'">
           <div class="paneL__editor">
@@ -20,10 +50,18 @@
           </div>
           <div class="paneL__nav">
             <div class="paneL__insertMenu">
-              <button class="insertButton" @click="insertExampleKanban"><span class="insertButton__plus">+</span> カンバン</button>
-              <button class="insertButton" @click="insertExampleGantt"><span class="insertButton__plus">+</span> ガント</button>
-              <button class="insertButton" @click="insertExampleCsv"><span class="insertButton__plus">+</span> CSV</button>
-              <button class="insertButton" @click="insertExampleBlock"><span class="insertButton__plus">+</span> ブロック図</button>
+              <button class="insertButton" @click="insertExampleKanban">
+                <span class="insertButton__plus">+</span> カンバン
+              </button>
+              <button class="insertButton" @click="insertExampleGantt">
+                <span class="insertButton__plus">+</span> ガント
+              </button>
+              <button class="insertButton" @click="insertExampleCsv">
+                <span class="insertButton__plus">+</span> CSV
+              </button>
+              <button class="insertButton" @click="insertExampleBlock">
+                <span class="insertButton__plus">+</span> ブロック図
+              </button>
               <!-- <button v-if="installPwaButtonVisible" class="installPwaButton" @click="installPwa">Install PWA</button> -->
             </div>
           </div>
@@ -35,14 +73,28 @@
               <div class="paneL__file__section__action" @click="addLocalStorageItem">+</div>
               <div class="paneL__file__section__action" @click="removeLocalStorageItem(path)">-</div>
             </div>
-            <div class="paneL__file__item" @dblclick="mode = 'editor'" @click="selectFile(f)" :class="{'active': path === f}" v-for="(f, index) in localStorageList" :key="index" v-text="f"></div>
+            <div
+              class="paneL__file__item"
+              @dblclick="mode = 'editor'"
+              @click="selectFile(f.key)"
+              :class="{'active': path === f.key}"
+              v-for="f in localStorageItems"
+              :key="f.key"
+              v-text="f.name"
+            ></div>
           </div>
         </div>
       </template>
       <template slot="paneR">
         <div id="output">
           <div class="markdown-body">
-            <div :is="block.type" :input="block.text" v-for="block in splited" :key="block.id" @change="updateBlock($event, block.id)"></div>
+            <div
+              :is="block.type"
+              :input="block.text"
+              v-for="block in splited"
+              :key="block.id"
+              @change="updateBlock($event, block.id)"
+            ></div>
           </div>
         </div>
       </template>
@@ -83,6 +135,8 @@ const filters = [
 
 let deferredPrompt;
 
+const localDb = new db.LocalDb();
+
 export default {
   name: "app",
   data() {
@@ -113,16 +167,13 @@ export default {
     },
     editor() {
       return this.$refs.codemirror.editor;
-    },
-    localStorageList() {
-      return Object.keys(this.localStorageItems);
     }
   },
   watch: {
     input() {
       this.checkDirty();
-      db.saveLocalStorage(this.path, this.input);
-      this.localStorageItems = db.loadLocalStorage();
+      localDb.load();
+      this.localStorageItems = localDb.cache;
 
       this.splited = compile(this.input);
     },
@@ -202,26 +253,31 @@ export default {
         this.$delete(this.localStorageItems, f);
         db.saveLocalStorageAll(this.localStorageItems);
         this.localStorageItems = db.loadLocalStorage();
-        this.path = this.localStorageList[0]
+        this.path = this.localStorageList[0];
         this.input = this.localStorageItems[this.path];
       }
     },
     selectFile(path) {
       this.path = path;
-      this.input = this.localStorageItems[path];
+      // this.input = this.localStorageItems[path];
+      this.input = this.localStorageItems.find(i => i.key === path).contents;
     }
   },
   mounted() {
-    const storage = db.loadLocalStorage();
-    const lastEdited = localStorage.getItem(db.LOCALSTORAGE_LAST_EDITED_FILE);
-    if (lastEdited) {
-      this.input = storage[lastEdited];
-      this.path = lastEdited;
-    } else {
-      this.input = storage["default"];
-      this.path = "default";
-    }
-    this.localStorageItems = storage;
+    localDb.load();
+    this.localStorageItems = localDb.cache;
+    // const storage = db.loadLocalStorage();
+    // const lastEdited = localStorage.getItem(db.LOCALSTORAGE_LAST_EDITED_FILE);
+    // if (lastEdited) {
+    //   this.input = storage[lastEdited];
+    //   this.path = lastEdited;
+    // } else {
+    //   this.input = storage["default"];
+    //   this.path = "default";
+    // }
+    // this.localStorageItems = storage;
+    this.path = this.localStorageItems[0].key;
+    this.input = this.localStorageItems[0].contents;
 
     window.addEventListener("beforeinstallprompt", e => {
       e.preventDefault();
