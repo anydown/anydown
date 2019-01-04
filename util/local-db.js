@@ -24,15 +24,20 @@ export class LocalDb {
     const found = this.read(key);
     if (found) {
       this.update(key, name, contents);
+    } else {
+      this.insert(name, contents);
     }
   }
 
   insert(name, contents) {
     const id = generateRandomId();
+    const timestamp = new Date().getTime();
     this.cache.push({
       key: id,
       name: name,
-      contents: contents
+      contents: contents,
+      updated_at: timestamp,
+      created_at: timestamp
     });
     return id;
   }
