@@ -59,33 +59,9 @@ export class LocalDb {
 
   load() {
     this.cache = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY));
-    if (!this.cache) {
+    if (!this.cache || this.cache.length === 0) {
       this.cache = [];
       this.insert("default", example);
     }
   }
 }
-
-// export function saveLocalStorage(key, data) {
-//   let storage = loadLocalStorage();
-//   if (storage) {
-//     storage[key] = data;
-//   } else {
-//     storage = {};
-//   }
-//   saveLocalStorageAll(storage);
-// }
-
-// export function saveLocalStorageAll(data) {
-//   localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data));
-// }
-
-// export function loadLocalStorage() {
-//   const data = localStorage.getItem(LOCALSTORAGE_KEY);
-//   if (data) {
-//     return JSON.parse(data);
-//   }
-//   return {
-//     default: example
-//   };
-// }

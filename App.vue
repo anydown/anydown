@@ -167,11 +167,16 @@ export default {
     },
     editor() {
       return this.$refs.codemirror.editor;
+    },
+    selected() {
+      return this.localStorageItems.find(i => i.key === this.path);
     }
   },
   watch: {
     input(val) {
       this.checkDirty();
+      localDb.update(this.path, this.selected.name, val);
+      localDb.save();
       localDb.load();
       this.localStorageItems = localDb.cache;
       this.splited = compile(val);
@@ -250,6 +255,7 @@ export default {
         localDb.delete(this.path);
         localDb.save();
         localDb.load();
+        this.localStorageItems = localDb.cache;
         this.path = this.localStorageItems[0].key;
         this.input = this.localStorageItems[0].contents;
       }
