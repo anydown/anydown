@@ -2,7 +2,9 @@ export const LOCALSTORAGE_KEY = "anydown_items_002";
 export const LOCALSTORAGE_LAST_EDITED_FILE = "anydown_last_edited_file";
 import { example } from "./example.js";
 
-function generateRandomId() {
+//TODO 作成日・更新日を追加
+
+export function generateRandomId() {
   return (
     Math.random()
       .toString(36)
@@ -26,11 +28,13 @@ export class LocalDb {
   }
 
   insert(name, contents) {
+    const id = generateRandomId();
     this.cache.push({
-      key: generateRandomId(),
+      key: id,
       name: name,
       contents: contents
     });
+    return id;
   }
 
   update(key, name, contents) {
@@ -54,7 +58,7 @@ export class LocalDb {
   }
 
   load() {
-    this.cache = localStorage.getItem(LOCALSTORAGE_KEY);
+    this.cache = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY));
     if (!this.cache) {
       this.cache = [];
       this.insert("default", example);

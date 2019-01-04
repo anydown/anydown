@@ -170,12 +170,11 @@ export default {
     }
   },
   watch: {
-    input() {
+    input(val) {
       this.checkDirty();
       localDb.load();
       this.localStorageItems = localDb.cache;
-
-      this.splited = compile(this.input);
+      this.splited = compile(val);
     },
     path(val) {
       this.lastEdited = val;
@@ -238,46 +237,33 @@ export default {
     addLocalStorageItem() {
       const text = window.prompt("新規メモのタイトル");
       if (text) {
-        if (this.localStorageList.indexOf(text) >= 0) {
-          alert("タイトルが重複しています。");
-          return;
-        }
-        this.path = text;
-        db.saveLocalStorage(this.path, "# " + this.path);
-        this.localStorageItems = db.loadLocalStorage();
-        this.input = this.localStorageItems[this.path];
+        const key = localDb.insert(text, `# ${text}`);
+        this.path = key;
+        localDb.save();
+        localDb.load();
+        this.localStorageItems = localDb.cache;
+        this.input = localDb.read(key).contents;
       }
     },
     removeLocalStorageItem(f) {
       if (window.confirm("選択中のメモを削除してもよろしいですか？")) {
-        this.$delete(this.localStorageItems, f);
-        db.saveLocalStorageAll(this.localStorageItems);
-        this.localStorageItems = db.loadLocalStorage();
-        this.path = this.localStorageList[0];
-        this.input = this.localStorageItems[this.path];
+        localDb.delete(this.path);
+        localDb.save();
+        localDb.load();
+        this.path = this.localStorageItems[0].key;
+        this.input = this.localStorageItems[0].contents;
       }
     },
     selectFile(path) {
       this.path = path;
-      // this.input = this.localStorageItems[path];
       this.input = this.localStorageItems.find(i => i.key === path).contents;
     }
   },
   mounted() {
     localDb.load();
     this.localStorageItems = localDb.cache;
-    // const storage = db.loadLocalStorage();
-    // const lastEdited = localStorage.getItem(db.LOCALSTORAGE_LAST_EDITED_FILE);
-    // if (lastEdited) {
-    //   this.input = storage[lastEdited];
-    //   this.path = lastEdited;
-    // } else {
-    //   this.input = storage["default"];
-    //   this.path = "default";
-    // }
-    // this.localStorageItems = storage;
-    this.path = this.localStorageItems[0].key;
-    this.input = this.localStorageItems[0].contents;
+    this.path = localDb.cache[0].key;
+    this.input = localDb.cache[0].contents;
 
     window.addEventListener("beforeinstallprompt", e => {
       e.preventDefault();
