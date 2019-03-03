@@ -71,17 +71,30 @@
             <div class="paneL__file__section">
               <div class="paneL__file__section__label">LOCAL STORAGE</div>
               <div class="paneL__file__section__action" @click="addLocalStorageItem">+</div>
-              <div class="paneL__file__section__action" @click="removeLocalStorageItem(path)">-</div>
+              <div
+                class="paneL__file__section__action"
+                @click="removeLocalStorageItem(selectedPath.path)"
+              >-</div>
             </div>
             <div
               class="paneL__file__item"
               @dblclick="mode = 'editor'"
               @click="selectFile(f.key)"
-              :class="{'active': path === f.key}"
+              :class="{'active': selectedPath.path === f.key}"
               v-for="f in localStorageItems"
               :key="f.key"
               v-text="f.name"
             ></div>
+            <div class="paneL__file__section">
+              <div class="paneL__file__section__label">CLOUD</div>
+              <div class="paneL__file__section__action" @click="addLocalStorageItem">+</div>
+              <div
+                class="paneL__file__section__action"
+                @click="removeLocalStorageItem(selectedPath.path)"
+              >-</div>
+            </div>
+            <div class="paneL__file__item" @click="login">LOGIN</div>
+            <div class="paneL__file__item" v-for="f in cloudDocs" :key="f.id" v-text="f.name"></div>
           </div>
         </div>
       </template>
@@ -126,6 +139,22 @@ import "codemirror/mode/markdown/markdown";
 import "codemirror/addon/edit/continuelist.js";
 import "codemirror/theme/monokai.css";
 
+import Vue from "vue";
+import firebase from "firebase";
+
+const setting = {
+  apiKey: "AIzaSyDZOkAvvvPZC0SUnIHPrux2GbvjYIWloAU",
+  authDomain: "anydown-8a33b.firebaseapp.com",
+  databaseURL: "https://anydown-8a33b.firebaseio.com",
+  projectId: "anydown-8a33b",
+  storageBucket: "anydown-8a33b.appspot.com",
+  messagingSenderId: "917597060499"
+};
+
+firebase.initializeApp(setting);
+
+const firestore = firebase.firestore();
+
 const filters = [
   {
     name: "Documents",
@@ -146,7 +175,10 @@ export default {
       input: "",
       originalInput: "",
       splited: [],
-      path: "",
+      selectedPath: {
+        path: "",
+        isCloud: false
+      },
       codeMirrorOption: {
         mode: "markdown",
         extraKeys: { Enter: "newlineAndIndentContinueMarkdownList" },
@@ -155,7 +187,8 @@ export default {
         lineWrapping: true,
         dragDrop: false //to prevent file drop insert
       },
-      installPwaButtonVisible: true
+      installPwaButtonVisible: true,
+      cloudDocs: []
     };
   },
   computed: {
@@ -169,13 +202,16 @@ export default {
       return this.$refs.codemirror.editor;
     },
     selected() {
-      return this.localStorageItems.find(i => i.key === this.path);
+      if (this.selectedPath.isCloud) {
+        return false;
+      }
+      return this.localStorageItems.find(i => i.key === this.selectedPath.path);
     }
   },
   watch: {
     input(val) {
       this.checkDirty();
-      localDb.update(this.path, this.selected.name, val);
+      localDb.update(this.selectedPath.path, this.selected.name, val);
       localDb.save();
       localDb.load();
       this.localStorageItems = localDb.cache;
@@ -184,13 +220,16 @@ export default {
     path(val) {
       this.lastEdited = val;
       localStorage.setItem(db.LOCALSTORAGE_LAST_EDITED_FILE, this.lastEdited);
-      document.title = "anydown - " + this.path;
+      document.title = "anydown - " + this.selected.name;
     }
   },
   methods: {
+    login() {
+      this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    },
     checkDirty() {
       const dirty = this.isDirty ? " *" : "";
-      document.title = "anydown - " + this.path + dirty;
+      document.title = "anydown - " + this.selected.name + dirty;
     },
     updateBlock(a, b) {
       this.splited[b].text = a;
@@ -243,7 +282,7 @@ export default {
       const text = window.prompt("新規メモのタイトル");
       if (text) {
         const key = localDb.insert(text, `# ${text}`);
-        this.path = key;
+        this.selectedPath = { path: key, isCloud: false };
         localDb.save();
         localDb.load();
         this.localStorageItems = localDb.cache;
@@ -252,23 +291,77 @@ export default {
     },
     removeLocalStorageItem(f) {
       if (window.confirm("選択中のメモを削除してもよろしいですか？")) {
-        localDb.delete(this.path);
+        localDb.delete(this.selectedPath.path);
         localDb.save();
         localDb.load();
         this.localStorageItems = localDb.cache;
-        this.path = this.localStorageItems[0].key;
+        this.selectedPath.path = this.localStorageItems[0].key;
         this.input = this.localStorageItems[0].contents;
       }
     },
     selectFile(path) {
-      this.path = path;
+      this.selectedPath = { path: path, isCloud: false };
       this.input = this.localStorageItems.find(i => i.key === path).contents;
+    },
+    storeUser(user) {
+      let { email, displayName, photoURL } = user;
+      const users = firestore.collection("users");
+
+      users
+        .doc(user.uid)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            console.log("Document data:", doc.data());
+          } else {
+            users
+              .doc(user.uid)
+              .set({
+                name: displayName,
+                email: email
+              })
+              .then(() => {
+                console.log("Document successfully written!");
+              })
+              .catch(error => {
+                console.error("Error writing document: ", error);
+              });
+          }
+        })
+        .catch(error => {
+          console.error("Error getting document:", error);
+        });
     }
   },
   mounted() {
+    this.auth = firebase.auth();
+    this.auth.onAuthStateChanged(user => {
+      if (user) {
+        this.storeUser(user);
+        this.user = user;
+        const docsRef = firestore
+          .collection("users")
+          .doc(user.uid)
+          .collection("docs");
+
+        docsRef.onSnapshot(querySnapshot => {
+          const docs = [];
+          querySnapshot.forEach(function(doc) {
+            const data = doc.data();
+            const key = doc.id;
+            docs.push({
+              id: key,
+              ...data
+            });
+          });
+          this.cloudDocs = docs;
+        });
+      }
+    });
     localDb.load();
     this.localStorageItems = localDb.cache;
-    this.path = localDb.cache[0].key;
+    this.selectedPath.path = localDb.cache[0].key;
+    this.selected.isCloud = false;
     this.input = localDb.cache[0].contents;
 
     window.addEventListener("beforeinstallprompt", e => {
