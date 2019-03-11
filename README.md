@@ -55,6 +55,7 @@ Node.js version 10.x で動作確認をしています。
 ```bash
 npm install
 npm run dev
+# 開発用サーバが起動するので、ブラウザでhttp://localhost:1234を開く
 ```
 
 あるいは
