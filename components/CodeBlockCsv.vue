@@ -1,27 +1,72 @@
 <template>
   <div class="grid" @mouseup="onMouseUpSvg()" @mousemove="headerResizeMove">
-    <svg :width="positionLeft(data.length + 1) + 1" height=24>
-      <g v-for="(col, ci) in headerObj" :key="ci" :transform="translateCol(ci)" @mousedown="startColumnSelect(ci)" @mousemove="changeColumnSelect(ci)" @mouseup="endColumnSelect">
-        <rect class="col-header" x=0 y=0 :width="widthAt(ci)" :height="rowHeight">
-        </rect>
-        <text class="col-header__text" text-anchor="middle" :x="widthAt(ci) / 2" y=12 :width="widthAt(ci)" :height="rowHeight">{{col.name}}</text>
-        <rect class="col-header__resize" :class="{'active': ci === headerResizeAt}" :x="widthAt(ci) - 5" :y=0 :width="5" :height="rowHeight" @mousedown.stop="headerResizeStart(ci)"></rect>
+    <svg :width="positionLeft(data.length + 1) + 1" height="24">
+      <g
+        v-for="(col, ci) in headerObj"
+        :key="ci"
+        :transform="translateCol(ci)"
+        @mousedown="startColumnSelect(ci)"
+        @mousemove="changeColumnSelect(ci)"
+        @mouseup="endColumnSelect"
+      >
+        <rect class="col-header" x="0" y="0" :width="widthAt(ci)" :height="rowHeight"></rect>
+        <text
+          class="col-header__text"
+          text-anchor="middle"
+          :x="widthAt(ci) / 2"
+          y="12"
+          :width="widthAt(ci)"
+          :height="rowHeight"
+        >{{col.name}}</text>
+        <rect
+          class="col-header__resize"
+          :class="{'active': ci === headerResizeAt}"
+          :x="widthAt(ci) - 5"
+          :y="0"
+          :width="5"
+          :height="rowHeight"
+          @mousedown.stop="headerResizeStart(ci)"
+        ></rect>
       </g>
     </svg>
 
-    <div ref="wrapper" style="height: 400px; overflow: scroll; position:relative;" :style="{'height': (data.length + 1) * 24 }">
-      <svg :width="positionLeft(data.length + 1) + 1" :height="data.length * 24" >
+    <div
+      ref="wrapper"
+      style="height: 400px; overflow: scroll; position:relative;"
+      :style="{'height': (data.length + 1) * 24 }"
+    >
+      <svg :width="positionLeft(data.length + 1) + 1" :height="data.length * 24">
         <g v-for="(row, ri) in data" :key="ri" :transform="translateRow(ri)">
-          <g v-for="(col, ci) in row" :key="ci" :transform="translateCol(ci)" @mousedown="onMouseDownCell(ci, ri)" @mousemove="onMouseMoveCell(ci, ri)">
-            <rect x=0 y=0 :width="widthAt(ci)" :height="rowHeight">
-            </rect>
-            <text x=2 y=12 :width="widthAt(ci)" :height="rowHeight">{{col}}</text>
+          <g
+            v-for="(col, ci) in row"
+            :key="ci"
+            :transform="translateCol(ci)"
+            @mousedown="onMouseDownCell(ci, ri)"
+            @mousemove="onMouseMoveCell(ci, ri)"
+          >
+            <rect x="0" y="0" :width="widthAt(ci)" :height="rowHeight"></rect>
+            <text x="2" y="12" :width="widthAt(ci)" :height="rowHeight">{{col}}</text>
           </g>
         </g>
-        <rect :transform="selectionTransform" class="selection" x=0 y=0 :width="selectionSize.w" :height="selectionCount.h * rowHeight"></rect>
+        <rect
+          :transform="selectionTransform"
+          class="selection"
+          x="0"
+          y="0"
+          :width="selectionSize.w"
+          :height="selectionCount.h * rowHeight"
+        ></rect>
       </svg>
       <div class="editor__frame" :style="editorStyleObj">
-        <input ref="hiddenInput"  @mousedown="onMouseDownCell(selection.c, selection.r)" class="editor__textarea" v-model="editingText" @blur="onBlur" :class="{'editor--visible': editing}" autofocus />
+        <input
+          ref="hiddenInput"
+          @mousedown="onMouseDownCell(selection.c, selection.r)"
+          class="editor__textarea"
+          v-model="editingText"
+          @blur="onBlur"
+          :class="{'editor--visible': editing}"
+          autofocus
+        >
       </div>
     </div>
   </div>
