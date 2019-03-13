@@ -86,15 +86,22 @@
               v-text="f.name"
             ></div>
             <div class="paneL__file__section">
-              <div class="paneL__file__section__label">CLOUD</div>
+              <div class="paneL__file__section__label">CLOUD @{{user.displayName}}</div>
               <div class="paneL__file__section__action" @click="addLocalStorageItem">+</div>
               <div
                 class="paneL__file__section__action"
                 @click="removeLocalStorageItem(selectedPath.path)"
               >-</div>
             </div>
-            <div class="paneL__file__item" @click="login">LOGIN</div>
-            <div class="paneL__file__item" v-for="f in cloudDocs" :key="f.id" v-text="f.name"></div>
+            <div class="paneL__file__item" v-if="!user.uid" @click="login">Login with Google</div>
+            <div
+              class="paneL__file__item"
+              v-for="f in cloudDocs"
+              :key="f.id"
+              v-text="f.name"
+              @click="selectCloudFile(f.id)"
+              :class="{'active': selectedPath.path === f.id}"
+            ></div>
           </div>
         </div>
       </template>
@@ -141,6 +148,7 @@ import "codemirror/theme/monokai.css";
 
 import Vue from "vue";
 import firebase from "firebase";
+let docsRef;
 
 const setting = {
   apiKey: "AIzaSyDZOkAvvvPZC0SUnIHPrux2GbvjYIWloAU",
@@ -170,6 +178,7 @@ export default {
   name: "app",
   data() {
     return {
+      user: {},
       mode: "editor",
       localStorageItems: {},
       input: "",
@@ -203,7 +212,7 @@ export default {
     },
     selected() {
       if (this.selectedPath.isCloud) {
-        return false;
+        return this.cloudDocs.find(i => i.id === this.selectedPath.path);
       }
       return this.localStorageItems.find(i => i.key === this.selectedPath.path);
     }
@@ -211,10 +220,18 @@ export default {
   watch: {
     input(val) {
       this.checkDirty();
-      localDb.update(this.selectedPath.path, this.selected.name, val);
-      localDb.save();
-      localDb.load();
-      this.localStorageItems = localDb.cache;
+      if (this.selectedPath.isCloud) {
+        docsRef.doc(this.selectedPath.path).set({
+          name: this.selected.name,
+          contents: val,
+          updatedAt: new Date().getTime()
+        });
+      } else {
+        localDb.update(this.selectedPath.path, this.selected.name, val);
+        localDb.save();
+        localDb.load();
+        this.localStorageItems = localDb.cache;
+      }
       this.splited = compile(val);
     },
     path(val) {
@@ -303,6 +320,10 @@ export default {
       this.selectedPath = { path: path, isCloud: false };
       this.input = this.localStorageItems.find(i => i.key === path).contents;
     },
+    selectCloudFile(id) {
+      this.selectedPath = { path: id, isCloud: true };
+      this.input = this.selected.contents;
+    },
     storeUser(user) {
       let { email, displayName, photoURL } = user;
       const users = firestore.collection("users");
@@ -339,20 +360,24 @@ export default {
       if (user) {
         this.storeUser(user);
         this.user = user;
-        const docsRef = firestore
+        docsRef = firestore
           .collection("users")
           .doc(user.uid)
           .collection("docs");
 
         docsRef.onSnapshot(querySnapshot => {
           const docs = [];
-          querySnapshot.forEach(function(doc) {
+          querySnapshot.forEach(doc => {
             const data = doc.data();
             const key = doc.id;
             docs.push({
               id: key,
               ...data
             });
+            if (key === this.selectedPath.path) {
+              //TODO Don't receive event by myself
+              this.input = data.contents;
+            }
           });
           this.cloudDocs = docs;
         });
