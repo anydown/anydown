@@ -1,5 +1,5 @@
 <template>
-  <svg class="gantt" :width="svgWidth" :height="tasks.length * 32 + 48" @pointermove="onDrag" @pointerup="stopDrag" touch-action="none">
+  <svg class="gantt" :width="svgWidth" :height="tasks.length * 32 + 48" @pointermove="onDrag" @pointerup="stopDrag">
     <!-- 全体を32px下げる（日付用余白） -->
     <g transform="translate(0, 48)">
       <!-- 背景 -->
@@ -90,6 +90,9 @@ export default {
       }
     },
     startDrag(e, index) {
+      const el = e.currentTarget;
+      el.setPointerCapture(e.pointerId);
+
       this.dragging = "move";
       this.selectedIndex = index;
       //ページ左上とオブジェクト左上の差分から、ドラッグ開始位置（オブジェクト相対座標）を取得
@@ -236,6 +239,7 @@ function generateLineByRange(start, end, displayRange, svgWidth) {
 }
 </script>
 <style>
+
 .task {
   fill: rgb(144, 144, 255);
   cursor: pointer;
@@ -252,6 +256,7 @@ function generateLineByRange(start, end, displayRange, svgWidth) {
 svg.gantt {
   cursor: default;
   user-select: none;
+  touch-action: none;
 }
 .taskname {
   cursor: default;

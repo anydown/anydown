@@ -444,6 +444,7 @@ input {
 
 svg {
   display: block;
+  touch-action: none;
 }
 
 .editor__textarea {

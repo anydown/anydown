@@ -1,5 +1,5 @@
 <template>
-    <svg ref="canv" height=400 width="600" tabindex="0" @focus="editorFocus" @blur="editorBlur" @keydown="globalKeydown" touch-action="none">
+    <svg ref="canv" height=400 width="600" tabindex="0" @focus="editorFocus" @blur="editorBlur" @keydown="globalKeydown">
 
         <g v-for="(item, idx) in items" :key="idx" @pointerdown="selectedIndex = idx">
             <g v-if="item.type === 'box'" :transform="`translate(${item.x}, ${item.y})`">
@@ -371,6 +371,7 @@ svg {
   border: 1px solid #999;
   user-select: none;
   background: #f0f0f0;
+  touch-action: none;
 }
 .innerText {
   margin: 0.5rem;
