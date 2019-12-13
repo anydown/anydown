@@ -1,5 +1,5 @@
 <template>
-  <svg class="gantt" :width="svgWidth" :height="tasks.length * 32 + 48" @pointermove="onDrag" @pointerup="stopDrag">
+  <svg class="gantt" :width="svgWidth" :height="tasks.length * 32 + 48" @pointermove="onDrag" @pointerup="stopDrag" touch-action="none">
     <!-- 全体を32px下げる（日付用余白） -->
     <g transform="translate(0, 48)">
       <!-- 背景 -->
