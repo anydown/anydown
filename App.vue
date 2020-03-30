@@ -93,7 +93,7 @@
               :input="block.text"
               v-for="block in splited"
               :key="block.id"
-              @change="updateBlock($event, block.id)"
+              @change="updateBlock($event, block.id, block.type)"
             ></div>
           </div>
         </div>
@@ -192,8 +192,8 @@ export default {
       const dirty = this.isDirty ? " *" : "";
       document.title = "anydown - " + this.path + dirty;
     },
-    updateBlock(a, b) {
-      this.splited[b].text = a;
+    updateBlock(a, b, type) {
+      this.splited[b].text = type +"\n"+ a;
       this.input = this.splited.map(i => i.text).join("```");
     },
     resetDirtyFlag() {
@@ -278,12 +278,12 @@ export default {
     });
   },
   components: {
-    MarkdownBlock,
-    CodeBlockKanban,
-    CodeBlockGantt,
-    CodeBlockCsv,
-    CodeBlockBlock,
-    CodeBlockPre,
+    markdown: MarkdownBlock,
+    kanban: CodeBlockKanban,
+    gantt: CodeBlockGantt,
+    csv: CodeBlockCsv,
+    block: CodeBlockBlock,
+    plain: CodeBlockPre,
     codemirror,
     VueSplitPane
   }

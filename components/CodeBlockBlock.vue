@@ -324,8 +324,7 @@ export default {
       return this.items[this.selectedIndex];
     },
     stringData() {
-      return `block
-${this.items
+      return `${this.items
         .map(i => {
           if (i.type === "box") {
             return "- " + [i.text, i.x, i.y, i.width, i.height].join(" ");

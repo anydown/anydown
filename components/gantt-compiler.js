@@ -32,7 +32,6 @@ function ymdFromEpoc(epoc, offset) {
 
 export function serialize(tasks) {
   return (
-    "gantt\n" +
     tasks
       .map(item => {
         return `${item.name} ${ymdFromEpoc(item.start)} ${ymdFromEpoc(

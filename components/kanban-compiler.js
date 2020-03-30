@@ -43,7 +43,6 @@ function toList(card) {
 
 export function serializeKanban(data) {
   return (
-    "kanban\n" +
     data
       .map(item => {
         return `# ${item.name}\n${cardsToString(item.cards)}`;

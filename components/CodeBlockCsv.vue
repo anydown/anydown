@@ -107,8 +107,7 @@ export default {
           });
     },
     stringData() {
-      return `csv
-${this.data.map(i => i.join(",")).join("\n")}
+      return `${this.data.map(i => i.join(",")).join("\n")}
 `;
     }
   },
