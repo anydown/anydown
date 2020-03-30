@@ -87,15 +87,7 @@
       </template>
       <template slot="paneR">
         <div id="output">
-          <div class="markdown-body">
-            <div
-              :is="block.type"
-              :input="block.text"
-              v-for="block in splited"
-              :key="block.id"
-              @change="updateBlock($event, block.id, block.type)"
-            ></div>
-          </div>
+          <anydown :blocks="splited" @change="updateBlock($event)"></anydown>
         </div>
       </template>
     </vue-split-pane>
@@ -103,12 +95,7 @@
 </template>
 
 <script>
-import MarkdownBlock from "./components/MarkdownBlock.vue";
-import CodeBlockKanban from "./components/CodeBlockKanban.vue";
-import CodeBlockGantt from "./components/CodeBlockGantt.vue";
-import CodeBlockCsv from "./components/CodeBlockCsv.vue";
-import CodeBlockBlock from "./components/CodeBlockBlock.vue";
-import CodeBlockPre from "./components/CodeBlockPre.vue";
+import Anydown from "./components/Anydown.vue"
 import { example } from "./util/example.js";
 import { compile } from "./util/document-compiler";
 import {
@@ -192,8 +179,8 @@ export default {
       const dirty = this.isDirty ? " *" : "";
       document.title = "anydown - " + this.path + dirty;
     },
-    updateBlock(a, b, type) {
-      this.splited[b].text = type +"\n"+ a;
+    updateBlock(payload) {
+      this.splited[payload.id].text = payload.type +"\n"+ payload.body;
       this.input = this.splited.map(i => i.text).join("```");
     },
     resetDirtyFlag() {
@@ -278,14 +265,9 @@ export default {
     });
   },
   components: {
-    markdown: MarkdownBlock,
-    kanban: CodeBlockKanban,
-    gantt: CodeBlockGantt,
-    csv: CodeBlockCsv,
-    block: CodeBlockBlock,
-    plain: CodeBlockPre,
     codemirror,
-    VueSplitPane
+    VueSplitPane,
+    Anydown
   }
 };
 </script>
