@@ -137,6 +137,32 @@ let deferredPrompt;
 
 const localDb = new db.LocalDb();
 
+import Dexie from "dexie";
+var dexie = new Dexie("anydown");
+
+dexie.version(1).stores({
+  friends: '++id, name, age'
+});
+// dexie.friends.add({
+//   name: 'Camilla',
+//   age: 25,
+//   street: 'East 13:th Street'
+// });
+// async function insertTest(){
+// 	// Find some old friends
+// 	const oldFriends = await dexie.friends
+// 		.where('age').above(75)
+// 		.toArray();
+
+// 	// or make a new one
+// 	await dexie.friends.add({
+// 		name: 'Camilla',
+// 		age: 25,
+// 		street: 'East 13:th Street'
+// 	});
+// }
+// insertTest();
+
 export default {
   name: "app",
   data() {
