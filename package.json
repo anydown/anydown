@@ -8,18 +8,16 @@
     "d3-scale": "^3.2.1",
     "markdown-it": "^10.0.0",
     "markdown-it-emoji": "^1.4.0",
-    "vue": "^2.6.10",
+    "vue": "^2.6.11",
     "vue-codemirror-lite": "^1.0.4",
     "vue-hot-reload-api": "^2.3.4",
     "vue-splitpane": "^1.0.6",
     "vuedraggable": "^2.23.2"
   },
   "devDependencies": {
-    "@vue/component-compiler-utils": "^3.1.0",
-    "cssnano": "^4.1.10",
+    "@vue/component-compiler-utils": "^3.1.1",
     "parcel": "^1.12.4",
-    "parcel-plugin-sw-precache": "^1.1.1",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.11"
   },
   "scripts": {
     "build": "parcel build index.html",
