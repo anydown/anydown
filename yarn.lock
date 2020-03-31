@@ -2,12 +2,12 @@
 # yarn lockfile v1
 
 
-"@anydown/anydown-core@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@anydown/anydown-core/-/anydown-core-1.0.1.tgz#663889ea636cc85add379d015588b7b9f6f93dbf"
-  integrity sha512-OBikHyiSMw9Ebg5735cZLE2ZLlObZ8if8WBfq7pDQN2YT4ka3kaqMG/hNYqzNDpicMyBiYa5iKysm3CoWljyBg==
+"@anydown/anydown-core@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@anydown/anydown-core/-/anydown-core-1.0.2.tgz#b37d0b2582919a63fc6097d90bd82d136f56c074"
+  integrity sha512-rz87oVatKhKWYuJ/KtWSVGc6Zj/AROMrkwDBkW28s9o+WmA8k92rnyeRrH3Jd3JNjitUYdsu4PLyYgmt/tKH8g==
   dependencies:
-    "@anydown/anydown-gantt" "^1.1.2"
+    "@anydown/anydown-gantt" "^1.2.0"
     d3-scale "^3.2.1"
     markdown-it "^10.0.0"
     markdown-it-emoji "^1.4.0"
@@ -17,10 +17,10 @@
     vue-splitpane "^1.0.6"
     vuedraggable "^2.23.2"
 
-"@anydown/anydown-gantt@^1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@anydown/anydown-gantt/-/anydown-gantt-1.1.2.tgz#0a54cbf767360d0f6d80dc1d1983e48323e93ac7"
-  integrity sha512-uDya0/Ylm37h76OiMhmgmGORwcOK4nRipr6kn2lVAkFDQCBpsv5RDGKMRxkp6bTW1f4ID7pztWa1ftyBAWPe6Q==
+"@anydown/anydown-gantt@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@anydown/anydown-gantt/-/anydown-gantt-1.2.0.tgz#c49d535ebd169b75df5e3dfe9eefb628bd98ef0d"
+  integrity sha512-yk+Jhc2jNmFwEMx2Es/pKKwVXoYgtQKLJChUVI6T/piKZbijeQNDeZr/hWXpMP7hX0goIxOoaL1ATql7Qc4Ypw==
   dependencies:
     "@holiday-jp/holiday_jp" "^2.2.3"
     d3-scale "^3.2.1"
