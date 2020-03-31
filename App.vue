@@ -95,7 +95,7 @@
 </template>
 
 <script>
-import Anydown from "./components/Anydown.vue"
+import Anydown from "@anydown/anydown-core"
 import { example } from "./util/example.js";
 import { compile } from "./util/document-compiler";
 import {
