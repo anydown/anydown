@@ -31,8 +31,8 @@ d.setDate(d.getDate() + 3);
 const exampleTask3 = `${d.getFullYear()}-${zeropad(d.getMonth() + 1)}-${zeropad(d.getDate())}`
 
 export const ganttExample = `\`\`\`gantt
-Task1 ${exampleTask1} ${exampleTask2}
-Task2 ${exampleTask2} ${exampleTask3}
+Task1,${exampleTask1},${exampleTask2}
+Task2,${exampleTask2},${exampleTask3}
 \`\`\`
 `
 
