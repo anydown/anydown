@@ -93,9 +93,9 @@
     </vue-split-pane>
   </div>
 </template>
-
 <script>
 import Anydown from "@anydown/anydown-core"
+import "@anydown/anydown-core/dist/anydown-core.es.css"
 import { example } from "./util/example.js";
 import { compile } from "./util/document-compiler";
 import {

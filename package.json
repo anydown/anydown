@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@anydown/anydown-core": "^1.1.0",
+    "@anydown/anydown-core": "^1.1.8",
     "codemirror": "^5.41.0",
     "d3-scale": "^3.2.1",
     "markdown-it": "^10.0.0",
