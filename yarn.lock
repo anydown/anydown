@@ -4684,6 +4684,11 @@ vue@^2.6.11:
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.11.tgz#76594d877d4b12234406e84e35275c6d514125c5"
   integrity sha512-VfPwgcGABbGAue9+sfrD4PuwFar7gPb1yl1UK1MwXoQPAw0BKSqWfoYCT/ThFrdEVWoI51dBuyCoiNU9bZDZxQ==
 
+vue@^2.6.12:
+  version "2.6.14"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.14.tgz#e51aa5250250d569a3fbad3a8a5a687d6036e235"
+  integrity sha512-x2284lgYvjOMj3Za7kqzRcUSxBboHqtgRE2zlos1qWaOye5yUmHn42LB1250NJBLRwEcdrB0JRwyPTEPhfQjiQ==
+
 vuedraggable@^2.23.2:
   version "2.23.2"
   resolved "https://registry.yarnpkg.com/vuedraggable/-/vuedraggable-2.23.2.tgz#0d95d7fdf4f02f56755a26b3c9dca5c7ca9cfa72"
