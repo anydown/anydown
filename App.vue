@@ -51,16 +51,16 @@
           <div class="paneL__nav">
             <div class="paneL__insertMenu">
               <button class="insertButton" @click="insertExampleKanban">
-                <span class="insertButton__plus">+</span> カンバン
+                <span class="insertButton__plus">+</span> Kanban
               </button>
               <button class="insertButton" @click="insertExampleGantt">
-                <span class="insertButton__plus">+</span> ガント
+                <span class="insertButton__plus">+</span> Gantt
               </button>
               <button class="insertButton" @click="insertExampleCsv">
                 <span class="insertButton__plus">+</span> CSV
               </button>
               <button class="insertButton" @click="insertExampleBlock">
-                <span class="insertButton__plus">+</span> ブロック図
+                <span class="insertButton__plus">+</span> BlockDiag
               </button>
               <!-- <button v-if="installPwaButtonVisible" class="installPwaButton" @click="installPwa">Install PWA</button> -->
             </div>
