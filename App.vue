@@ -106,10 +106,10 @@ import {
 } from "./util/menu";
 import * as db from "./util/local-db";
 
-import { codemirror } from "vue-codemirror-lite";
+import { codemirror } from "vue-codemirror-lite/dist/vuecodemirror.min.js";
 import VueSplitPane from "vue-splitpane";
 
-import "codemirror/mode/markdown/markdown";
+import "codemirror/mode/markdown/markdown.js";
 import "codemirror/addon/edit/continuelist.js";
 import "codemirror/theme/monokai.css";
 
