@@ -4,55 +4,47 @@ export const example = `# anydown
 
 ---
 
-## これはなに？
+## What is anydown?
 
-- Markdownで書けるメモ帳
-- スケジュール機能が充実している
-  - カンバンやガントチャートを埋め込んで編集できる
-  - Trelloに上げるほどでもない、ちょっとした予定表なんかを一枚のMarkdownでまとめることができる
-- 単なるテキストなので、エクスポートやメール添付がかんたん
-- ローカルストレージに自動保存
+- Markdown Notepad
+- Some components for scheduling
+  - Kanban board, Gantt chart, etc.
+- Just a plain text, useful for sharing
+- All data is stored in local storage
 
 ---
 
 \`\`\`kanban
 # TODO
-- ダブルクリックで編集できるよ
-- Trelloみたいにドラッグ＆ドロップできるよ
+- Double-click to edit
+- Drag and drop to reorder
 
 # DONE
-- タスク１
-- タスク２
+- Task 1
+- Task 2
 \`\`\`
 
-列も増減出来る（テキストで見出しを追加するだけ）
+3 columns
 
 \`\`\`kanban
 # BACKLOG
-- １シートに複数のカンバンを作れる
+- Multiple kanbans in one page
 # TODO
-- 他のカンバンにもドラッグ＆ドロップ出来るよ
+- Drag and drop to other kanban
 # DONE
 \`\`\`
 
 
-# ガントチャート機能
-
-直近２週間のガントチャートを表示出来る
+# Gantt Chart
 
 ${ganttExample}
 
-# スプレッドシート
+# Spread Sheet
 
 ${csvExample}
 
-# ブロック図エディタ
+# Block Diagram
 
 ${blockExample}
-
-# たぶん実装されない機能
-
-- アラーム機能などは実装されない（Googleカレンダーの方が便利）
-- カレンダー機能は実装されない（同上）
 
 `;

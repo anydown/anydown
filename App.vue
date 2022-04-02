@@ -51,16 +51,16 @@
           <div class="paneL__nav">
             <div class="paneL__insertMenu">
               <button class="insertButton" @click="insertExampleKanban">
-                <span class="insertButton__plus">+</span> カンバン
+                <span class="insertButton__plus">+</span> Kanban
               </button>
               <button class="insertButton" @click="insertExampleGantt">
-                <span class="insertButton__plus">+</span> ガント
+                <span class="insertButton__plus">+</span> Gantt
               </button>
               <button class="insertButton" @click="insertExampleCsv">
                 <span class="insertButton__plus">+</span> CSV
               </button>
               <button class="insertButton" @click="insertExampleBlock">
-                <span class="insertButton__plus">+</span> ブロック図
+                <span class="insertButton__plus">+</span> BlockDiag
               </button>
               <!-- <button v-if="installPwaButtonVisible" class="installPwaButton" @click="installPwa">Install PWA</button> -->
             </div>
@@ -106,10 +106,10 @@ import {
 } from "./util/menu";
 import * as db from "./util/local-db";
 
-import { codemirror } from "vue-codemirror-lite";
+import { codemirror } from "vue-codemirror-lite/dist/vuecodemirror.min.js";
 import VueSplitPane from "vue-splitpane";
 
-import "codemirror/mode/markdown/markdown";
+import "codemirror/mode/markdown/markdown.js";
 import "codemirror/addon/edit/continuelist.js";
 import "codemirror/theme/monokai.css";
 
