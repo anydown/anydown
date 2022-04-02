@@ -4,4 +4,9 @@ export default {
   plugins: [
     createVuePlugin(/* options */)
   ],
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
 }
