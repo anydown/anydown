@@ -6,8 +6,8 @@
   "dependencies": {
     "@anydown/anydown-core": "^1.1.8",
     "codemirror": "^5.58.2",
-    "d3-scale": "^3.2.1",
-    "markdown-it": "^10.0.0",
+    "d3-scale": "^4.0.2",
+    "markdown-it": "^12.3.2",
     "markdown-it-emoji": "^1.4.0",
     "vue": "^2.6.12",
     "vue-codemirror-lite": "^1.0.4",
@@ -19,9 +19,9 @@
     "@vue/component-compiler-utils": "^3.1.1",
     "bili": "^4.8.1",
     "rollup-plugin-vue": "^5.1.5",
+    "vite": "^2.7.2",
     "vite-plugin-vue2": "^1.9.3",
-    "vue-template-compiler": "^2.6.12",
-    "vite": "^2.7.2"
+    "vue-template-compiler": "^2.6.12"
   },
   "scripts": {
     "dev": "vite",
