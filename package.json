@@ -7,7 +7,7 @@
     "@anydown/anydown-core": "^1.1.8",
     "codemirror": "^5.58.2",
     "d3-scale": "^3.2.1",
-    "markdown-it": "^10.0.0",
+    "markdown-it": "^12.3.2",
     "markdown-it-emoji": "^1.4.0",
     "vue": "^2.6.12",
     "vue-codemirror-lite": "^1.0.4",
