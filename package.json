@@ -19,7 +19,7 @@
     "@vue/component-compiler-utils": "^3.1.1",
     "bili": "^4.8.1",
     "rollup-plugin-vue": "^5.1.5",
-    "vite": "^2.9.13",
+    "vite": "^2.9.16",
     "vite-plugin-vue2": "^1.9.3",
     "vue-template-compiler": "^2.6.12"
   },
